@@ -62,14 +62,32 @@ start(N) ->
 	% Show the frame to display the canvas
 	wxFrame:show(Frame),
 	% Sleep for 10 seconds (delay the termination of the application)
-	timer:sleep(10000),
-	
+%%	timer:sleep(10000),
+	canvas_loop(main_ets, Frame, BmpGeneral, BmpCeed, BmpLeaf, BmpAntena, BmpRoot, N, 10),
 	% Destroy the wxWidgets application and cleanup resources	
-	wx:destroy(),
-	
+	wx:destroy(),	
 	% Delete the 'main_ets' table
 	ets:delete(main_ets),	
 	ok.
+
+% Function to continuously update and display the canvas
+canvas_loop(_main_ets,_Frame, _BmpGeneral, _BmpCeed, _BmpLeaf , _BmpAntena , _BmpRoot,_N,0) ->
+	ok;	
+canvas_loop(main_ets, Frame, BmpGeneral, BmpCeed, BmpLeaf, BmpAntena, BmpRoot, N, I) ->
+	% Clear the 'main_ets' table
+	ets:delete_all_objects(main_ets),
+	% Insert new random cells into the 'main_ets' table
+	insert_cells(N),
+	% Clear the canvas by destroying all children of the frame
+	wxWindow:destroyChildren(Frame),
+	% Print the updated cells on the canvas
+	print_cells(main_ets,ets:first(main_ets), Frame, BmpGeneral, BmpCeed, BmpLeaf , BmpAntena , BmpRoot),
+	% Refresh the canvas to display the changes
+	wxWindow:refresh(Frame),
+	% Introduce a delay for animation effect
+	timer:sleep(500),
+	 % Recursive call to continue the loop
+	canvas_loop(main_ets, Frame, BmpGeneral, BmpCeed, BmpLeaf, BmpAntena, BmpRoot, N, I-1).
 
 % Function to print cells on the canvas based on the data in 'main_ets' table
 % Input: Key (the current key in the 'main_ets' table)
@@ -111,5 +129,3 @@ insert_cells(N) ->
 
 	% Recursively insert (N-1) points
 	insert_cells(N - 1).
-
-
