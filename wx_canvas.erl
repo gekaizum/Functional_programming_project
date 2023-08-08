@@ -8,6 +8,7 @@
 -define(y_cell_size,(40)).
 -define(x_leaf_size,(20)).
 -define(y_leaf_size,(20)).
+-define(refresh_time,(250)).
 
 % Function to start the canvas application
 % Input: N (number of Cells to insert)
@@ -63,7 +64,7 @@ start(N) ->
 	wxFrame:show(Frame),
 	% Sleep for 10 seconds (delay the termination of the application)
 %%	timer:sleep(10000),
-	canvas_loop(main_ets, Frame, BmpGeneral, BmpCeed, BmpLeaf, BmpAntena, BmpRoot, N, 10),
+	canvas_loop(main_ets, Frame, BmpGeneral, BmpCeed, BmpLeaf, BmpAntena, BmpRoot, N, 50),
 	% Destroy the wxWidgets application and cleanup resources	
 	wx:destroy(),	
 	% Delete the 'main_ets' table
@@ -85,7 +86,7 @@ canvas_loop(main_ets, Frame, BmpGeneral, BmpCeed, BmpLeaf, BmpAntena, BmpRoot, N
 	% Refresh the canvas to display the changes
 	wxWindow:refresh(Frame),
 	% Introduce a delay for animation effect
-	timer:sleep(500),
+	timer:sleep(?refresh_time),
 	 % Recursive call to continue the loop
 	canvas_loop(main_ets, Frame, BmpGeneral, BmpCeed, BmpLeaf, BmpAntena, BmpRoot, N, I-1).
 
