@@ -103,11 +103,11 @@ insert_cells(0) ->
 	ok;
 insert_cells(N) ->
 	% Insert a random blue cell and a random green cell into the 'main_ets' table
-	ets:insert(main_ets, {{rand:uniform(1000),rand:uniform(1000)}, general}),
-	ets:insert(main_ets, {{rand:uniform(1000),rand:uniform(1000)}, ceed}),
-	ets:insert(main_ets, {{rand:uniform(1000),rand:uniform(1000)}, leaf}),
-	ets:insert(main_ets, {{rand:uniform(1000),rand:uniform(1000)}, antena}),
-	ets:insert(main_ets, {{rand:uniform(1000),rand:uniform(1000)}, root}),
+	ets:insert(main_ets, {{rand:uniform(?x_frame_size),rand:uniform(?y_frame_size)}, general}),
+	ets:insert(main_ets, {{rand:uniform(?x_frame_size),rand:uniform(?y_frame_size)}, ceed}),
+	ets:insert(main_ets, {{rand:uniform(?x_frame_size),rand:uniform(?y_frame_size)}, leaf}),
+	ets:insert(main_ets, {{rand:uniform(?x_frame_size),rand:uniform(?y_frame_size)}, antena}),
+	ets:insert(main_ets, {{rand:uniform(?x_frame_size),rand:uniform(?y_frame_size)}, root}),
 
 	% Recursively insert (N-1) points
 	insert_cells(N - 1).
