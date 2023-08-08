@@ -2,6 +2,8 @@
 -export([start/1]).
 -include_lib("wx/include/wx.hrl").
 -author("Shaked Basa").
+-define(x_frame_size,(1000)).
+-define(y_frame_size,(1000)).
 -define(x_cell_size,(40)).
 -define(y_cell_size,(40)).
 -define(x_leaf_size,(20)).
@@ -21,7 +23,7 @@ start(N) ->
     	insert_cells(N),
 	
 	% Create a new frame (window)
-	Frame = wxFrame:new(wx:null(), 1, "Life_and_Evolution_of_cells",[{size,{1000,1000}}]),
+	Frame = wxFrame:new(wx:null(), 1, "Life_and_Evolution_of_cells",[{size,{?x_frame_size,?y_frame_size}}]),
 	
 	% Load and scale the cells images from file
 	General = wxImage:new("general.png"),
@@ -109,6 +111,5 @@ insert_cells(N) ->
 
 	% Recursively insert (N-1) points
 	insert_cells(N - 1).
-
 
 
