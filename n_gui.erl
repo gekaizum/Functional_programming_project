@@ -12,7 +12,7 @@
 
 
 start() ->
-	
+	%timer:sleep(3000),
 	%graphic_node:start([BoardSize,TotalProcNum,ListOfNodeNames,Energy,Organic,EnvEnergy,EnvOrganic]), %ListOfNodeNames=[]
 	% Start the wxWidgets application
 	wx:new(),
@@ -229,6 +229,9 @@ print_cells(World_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , B
 	receive
 		{kill} -> 
 			wxFrame:destroy(World_Frame),
+			wx:destroy(),
+			spawn(?MODULE, start, []),
+			%timer:exit_after(4000, self(), normal);
 			exit(self());
 		
 		%%ETS line [{{X_coordinate,Y_coordinate},{{EnvOrganic,EnvEnergy},{cell_type,energy,organic,TTL,cells_created,wooded}}},{...},{...}] no cell = none
@@ -295,7 +298,6 @@ init_handle_click(#wx{obj = _Init_Button, userData = #{input_1 := Input_1,input_
 start_handle_click(#wx{obj = Start_Button,userData = #{ input_2 := Input_2, env := Env, stats_frame := Stats_Frame, s_stat_1 := S_Stat_1, organic_button := Organic_Button,energy_button := Energy_Button }}, _Event) ->
 	wx:set_env(Env),
 	Label = wxButton:getLabel(Start_Button),
-	io:format("~nButton handler, Input 2 = ~p~n",[Input_2]),
 	case Label of
 
 		"Start" ->	
@@ -341,8 +343,9 @@ start_handle_click(#wx{obj = Start_Button,userData = #{ input_2 := Input_2, env 
 			io:format("~nMessage to stop frame sent~n",[]),
 			(global:whereis_name(main_node))!{stop},
 			io:format("~nMessage to stop main_node sent~n",[]),
-			spawn(?MODULE, start, []),
-			exit(self())		
+			%wx:destroy(),
+			%spawn(?MODULE, start, []),
+			exit(self())
 	end.
 
 %% Function to handle organic_button click events
