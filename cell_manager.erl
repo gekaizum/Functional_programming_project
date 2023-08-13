@@ -32,7 +32,7 @@ code_change(_,_,_) -> {ok,normal}.
 %%/////////////////////////////////////////////////////Handlers of type call///////////////////////////////////////////////////////////
 %%/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 %%Coordinates is out of range of current node
-handle_call({move,X_axis,Y_axis,FromX,FromY},From,{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}) when ((Y_axis>Ymax) or (Y_axis<Ymax)) -> %1.Move
+handle_call({move,X_axis,Y_axis,FromX,FromY},From,{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}) when ((Y_axis>Ymax) or (Y_axis<Ymin)) -> %1.Move
 		loggerp!{cellInfo,"Cell Manager Handle call: Move out of node"},
 		if ((X_axis>Xmax) or (X_axis<Xmax)) -> 
 					NewPos_x=x_axisRepair(Xmin,Xmax,X_axis);
@@ -49,7 +49,7 @@ handle_call({move,X_axis,Y_axis,FromX,FromY},From,{Xmin,Ymin,Xmax,Ymax,ETS_name,
 		{reply,{FromX,FromY},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}};
 %%------------------------------------------------------------------------------------------------------------------------------------
 %%Coordinates is out of board range
-handle_call({move,X_axis,Y_axis,FromX,FromY},_From,{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}) when ((X_axis>Xmax) or (X_axis<Xmax)) -> %1.Move
+handle_call({move,X_axis,Y_axis,FromX,FromY},_From,{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}) when ((X_axis>Xmax) or (X_axis<Xmin)) -> %1.Move
 		loggerp!{cellInfo,"Cell Manager Handle call: Move out of range"},
 		NewPos=x_axisRepair(Xmin,Xmax,X_axis),
 		case ets:lookup(ETS_name,{NewPos,Y_axis}) of %check if move can be done
