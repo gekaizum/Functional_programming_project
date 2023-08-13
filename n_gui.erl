@@ -12,8 +12,7 @@
 
 
 start() ->
-	%timer:sleep(3000),
-	%graphic_node:start([BoardSize,TotalProcNum,ListOfNodeNames,Energy,Organic,EnvEnergy,EnvOrganic]), %ListOfNodeNames=[]
+
 	% Start the wxWidgets application
 	wx:new(),
 	% Create the Init_Frame
@@ -50,14 +49,12 @@ start() ->
 	
 	% Create a button labeled "Init" on the Init_Frame
 	Init_Button = wxButton:new(Init_Frame, ?wxID_ANY, [{label, "Init"}, {pos,{0, 64}}, {size, {150, 50}}]),
-	% Create a button labeled "start" on the Stats_far,e	
+	% Create a button labeled "start" on the Stats_Frame	
 	Start_Button = wxButton:new(Stats_Frame, ?wxID_ANY, [{label, "Start"}, {pos,{0, 64}}, {size, {150, 50}}]),
-	
+	% Create a buttons to show/hide the heatmaps of organic and energy 
 	Organic_Button = wxButton:new(Stats_Frame, ?wxID_ANY, [{label, "Show organic"}, {pos,{0, 64}}, {size, {150, 50}}]),	
 	Energy_Button = wxButton:new(Stats_Frame, ?wxID_ANY, [{label, "Show energy"}, {pos,{0, 64}}, {size, {150, 50}}]),
 
-	% Create a button labeled "Start"
-	%Button = wxButton:new(Init_Frame, ?wxID_ANY, [{label, "Start"}, {pos,{0, 64}}, {size, {150, 50}}]),
 	% Create a sizer to arrange the elements vertically
 	MainSizer = wxBoxSizer:new(?wxVERTICAL),
 	wxSizer:add(MainSizer, Label_1, [{flag, ?wxALIGN_CENTRE bor ?wxALL}, {border, 5}]),
@@ -153,10 +150,11 @@ start_sim(Cell_size,Input_2, Start_Button,Organic_Button,Energy_Button, Env, Sta
 	io:format("~nSimulation started~n",[]),
 	register(sim_gui, self()),
 	(global:whereis_name(main_node)) ! {start},
+	
 	% Set the environment
 	wx:set_env(Env),
 
-	% get user input 
+	% get user input for the world size
 	Frame_size = Input_2,	
 
 	% Create a new World_Frame
@@ -165,9 +163,8 @@ start_sim(Cell_size,Input_2, Start_Button,Organic_Button,Energy_Button, Env, Sta
 	Organic_Frame = wxFrame:new(wx:null(), 2, "Organic_Frame",[{size,{Cell_size*Frame_size + Cell_size*Frame_size div 3,Cell_size*Frame_size}}]),
 	% Create a new Energy_Frame
 	Energy_Frame = wxFrame:new(wx:null(), 3, "Energy_Frame",[{size,{Cell_size*Frame_size + Cell_size*Frame_size div 3,Cell_size*Frame_size}}]),	
-
 			
-	% Load and scale the cells images from file
+	% Load and scale the cells and heatmap images from files
 	General = wxImage:new("general.png"),
 	Generalc = wxImage:scale(General,Cell_size,Cell_size),
     	BmpGeneral = wxBitmap:new(Generalc),
@@ -240,6 +237,7 @@ start_sim(Cell_size,Input_2, Start_Button,Organic_Button,Energy_Button, Env, Sta
   	wxImage:destroy(Scale),
   	wxImage:destroy(Scalec),
   	
+  	%insert the heatmap scale on the organic and energy frames
   	wxStaticBitmap:new(Organic_Frame,?wxID_ANY , BmpScale, [{pos,{Cell_size*Frame_size + (Cell_size*Frame_size div 3) div 2, 5}}]),
   	wxStaticBitmap:new(Energy_Frame,?wxID_ANY , BmpScale, [{pos,{Cell_size*Frame_size + (Cell_size*Frame_size div 3) div 2, 5}}]),
   	
@@ -261,9 +259,9 @@ display_loop(Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,Wor
 	
 display_loop(Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, 1) ->
 			
-			% Clear the canvas by destroying all children of the World_Frame
-			% Print the updated cells on the canvas
-			Num_of_cells = print_cells(World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6), %add arg - list of elements
+			% Print the updated windows
+			Num_of_cells = print_cells(World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6),
+			
 			% Refresh the canvas to display the changes
 			wxTextCtrl:setValue(S_Stat_1, integer_to_list(Num_of_cells)),
 			wxWindow:refresh(World_Frame),
@@ -271,7 +269,7 @@ display_loop(Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,Wor
 			wxWindow:refresh(Energy_Frame),
 			wxWindow:refresh(Organic_Frame),
 			wxWindow:refresh(Stats_Frame),
-			% Introduce a delay for animation effect
+
 			% Recursive call to continue the loop
 			display_loop(Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, 1).
 			
@@ -285,7 +283,6 @@ print_cells(World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, Bmp
 			wxFrame:destroy(World_Frame),
 			wx:destroy(),
 			spawn(?MODULE, start, []),
-			%timer:exit_after(4000, self(), normal);
 			exit(self());
 		
 		%%ETS line [{{X_coordinate,Y_coordinate},{{EnvOrganic,EnvEnergy},{cell_type,energy,organic,TTL,cells_created,wooded}}},{...},{...}] no cell = none
