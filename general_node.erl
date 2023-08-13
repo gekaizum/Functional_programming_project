@@ -86,27 +86,27 @@ handle_info({init,NodeNameList,Cells_Amount,{Xmin,Ymin,Xmax,Ymax},Energy,Organic
 			{noreply,{Xmin,Ymin,Xmax,Ymax,ETS_name,My_name,NodeNameList,MailboxID}};
 %%------------------------------------------------------------------------------------------------------------------------------------
 %%ask node to send a cell to it
-handle_info({moveout,ProcID,X_axis,Y_axis,H},{Xmin,Ymin,Xmax,Ymax,ETS_name,My_name,NodeNameList,MailboxID}) -> %H={Cell_type,Energy,Organic,TTL,Cells_created,Wooded}
+handle_info({moveout,ProcID,X_axis,Y_axis,FromX,FromY,H},{Xmin,Ymin,Xmax,Ymax,ETS_name,My_name,NodeNameList,MailboxID}) -> %H={Cell_type,Energy,Organic,TTL,Cells_created,Wooded}
 			%%ETS line [{{X_coordinate,Y_coordinate},{{EnvOrganic,EnvEnergy},{cell_type,energy,organic,TTL,cells_created,wooded}}}]
 			NextNodeName=check_next_node(Y_axis,Ymax,My_name,NodeNameList),
 			if NextNodeName == My_name -> ok;
-			true -> global:whereis_name(NextNodeName)!{movein,ProcID,My_name,X_axis,Y_axis,H}
+			true -> global:whereis_name(NextNodeName)!{movein,ProcID,My_name,X_axis,Y_axis,FromX,FromY,H}
 			end,
 			{noreply,{Xmin,Ymin,Xmax,Ymax,ETS_name,My_name,NodeNameList,MailboxID}};
 %%------------------------------------------------------------------------------------------------------------------------------------
 %%somebody want to send us cell
-handle_info({movein,ProcID,NodeName,X_axis,Y_axis,H},{Xmin,Ymin,Xmax,Ymax,ETS_name,My_name,NodeNameList,MailboxID}) -> 
+handle_info({movein,ProcID,NodeName,X_axis,Y_axis,FromX,FromY,H},{Xmin,Ymin,Xmax,Ymax,ETS_name,My_name,NodeNameList,MailboxID}) -> 
 			if  Y_axis>Ymax -> NewPos_y=Ymin;
 				Y_axis<Ymin -> NewPos_y=Ymax;
 			true -> NewPos_y=Y_axis
 			end,
-			{_,Answer,_,_}=gen_server:call(cell_manager,{movein,X_axis,NewPos_y,H}),
-			global:whereis_name(NodeName)!{answer,Answer,ProcID,X_axis,NewPos_y,H},
+			{_,Answer,_,_,_,_}=gen_server:call(cell_manager,{movein,X_axis,NewPos_y,FromX,FromY,H}),
+			global:whereis_name(NodeName)!{answer,Answer,ProcID,X_axis,NewPos_y,FromX,FromY,H},
 			{noreply,{Xmin,Ymin,Xmax,Ymax,ETS_name,My_name,NodeNameList,MailboxID}};
 %%------------------------------------------------------------------------------------------------------------------------------------
 %%node answer about sending a cell to it
-handle_info({answer,Answer,ProcID,X_axis,Y_axis,_H},{Xmin,Ymin,Xmax,Ymax,ETS_name,My_name,NodeNameList,MailboxID}) -> 
-			cell_manager!{Answer,X_axis,Y_axis,ProcID},
+handle_info({answer,Answer,ProcID,X_axis,Y_axis,FromX,FromY,_H},{Xmin,Ymin,Xmax,Ymax,ETS_name,My_name,NodeNameList,MailboxID}) -> 
+			cell_manager!{Answer,X_axis,Y_axis,ProcID,FromX,FromY},
 			{noreply,{Xmin,Ymin,Xmax,Ymax,ETS_name,My_name,NodeNameList,MailboxID}};
 %%------------------------------------------------------------------------------------------------------------------------------------
 %%used for debugging
