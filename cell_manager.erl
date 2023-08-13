@@ -34,7 +34,7 @@ code_change(_,_,_) -> {ok,normal}.
 %%Coordinates is out of range of current node
 handle_call({move,X_axis,Y_axis,FromX,FromY},From,{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}) when ((Y_axis>Ymax) or (Y_axis<Ymin)) -> %1.Move
 		loggerp!{cellInfo,"Cell Manager Handle call: Move out of node"},
-		if ((X_axis>Xmax) or (X_axis<Xmax)) -> 
+		if ((X_axis>Xmax) or (X_axis<Xmin)) -> 
 					NewPos_x=x_axisRepair(Xmin,Xmax,X_axis);
 		true -> NewPos_x=X_axis
 		end,
