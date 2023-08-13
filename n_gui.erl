@@ -23,7 +23,7 @@ start() ->
 	% Create static labels
 	Label_1 = wxStaticText:new(Init_Frame, ?wxID_ANY, "TotalProcNum"),
 	Label_2 = wxStaticText:new(Init_Frame, ?wxID_ANY, "BoardSize"),
-	Label_3 = wxStaticText:new(Init_Frame, ?wxID_ANY, "Host name 1:"),   		%temp
+	Label_3 = wxStaticText:new(Init_Frame, ?wxID_ANY, "Host name 1:"),   		
 	Label_4 = wxStaticText:new(Init_Frame, ?wxID_ANY, "Energy"),
 	Label_5 = wxStaticText:new(Init_Frame, ?wxID_ANY, "Organic"),
 	Label_6 = wxStaticText:new(Init_Frame, ?wxID_ANY, "Environment Energy"),
@@ -85,6 +85,7 @@ start() ->
 	S_Label_4 = wxStaticText:new(Stats_Frame, ?wxID_ANY, "Stat_4"),
 	S_Label_5 = wxStaticText:new(Stats_Frame, ?wxID_ANY, "Stat_5"),
 	S_Label_6 = wxStaticText:new(Stats_Frame, ?wxID_ANY, "Stat_6"),
+	S_Label_7 = wxStaticText:new(Stats_Frame, ?wxID_ANY, "Sun"),
 
 	% Create Stat text fields with initial values and sizes
 	S_Stat_1 = wxTextCtrl:new(Stats_Frame, ?wxID_ANY,[{value, "0"}, {size, {150,50}}]),
@@ -93,6 +94,7 @@ start() ->
 	S_Stat_4 = wxTextCtrl:new(Stats_Frame, ?wxID_ANY,[{value, "0"}, {size, {150,50}}]),
 	S_Stat_5 = wxTextCtrl:new(Stats_Frame, ?wxID_ANY,[{value, "0"}, {size, {150,50}}]),
 	S_Stat_6 = wxTextCtrl:new(Stats_Frame, ?wxID_ANY,[{value, "0"}, {size, {150,50}}]),
+	S_Stat_7 = wxTextCtrl:new(Stats_Frame, ?wxID_ANY,[{value, "UP"}, {size, {150,50}}]),
 	
 	% Disable stats fields to edit
 	wxTextCtrl:setEditable(S_Stat_1, false),
@@ -101,6 +103,7 @@ start() ->
 	wxTextCtrl:setEditable(S_Stat_4, false),
 	wxTextCtrl:setEditable(S_Stat_5, false),
 	wxTextCtrl:setEditable(S_Stat_6, false),
+	wxTextCtrl:setEditable(S_Stat_7, false),
 	
 	% Create a font for the stats text fields
 	S_Font = wxFont:new(38,?wxFONTFAMILY_DEFAULT, ?wxFONTSTYLE_NORMAL, ?wxFONTWEIGHT_BOLD),
@@ -110,6 +113,7 @@ start() ->
 	wxTextCtrl:setFont(S_Stat_4, S_Font),
 	wxTextCtrl:setFont(S_Stat_5, S_Font),
 	wxTextCtrl:setFont(S_Stat_6, S_Font),
+	wxTextCtrl:setFont(S_Stat_7, S_Font),
 
 	% Create a sizer to arrange the elements vertically
 	S_Sizer = wxBoxSizer:new(?wxVERTICAL),
@@ -125,6 +129,8 @@ start() ->
 	wxSizer:add(S_Sizer, S_Stat_5, [{flag, ?wxEXPAND bor ?wxALL}, {border,5}]),
 	wxSizer:add(S_Sizer, S_Label_6, [{flag, ?wxALIGN_CENTRE bor ?wxALL}, {border, 5}]),
 	wxSizer:add(S_Sizer, S_Stat_6, [{flag, ?wxEXPAND bor ?wxALL}, {border,5}]),
+	wxSizer:add(S_Sizer, S_Label_7, [{flag, ?wxALIGN_CENTRE bor ?wxALL}, {border, 5}]),
+	wxSizer:add(S_Sizer, S_Stat_7, [{flag, ?wxEXPAND bor ?wxALL}, {border,5}]),
 	wxSizer:add(S_Sizer, Start_Button, [{flag, ?wxEXPAND bor ?wxALL}, {border,5}]),	
 	wxSizer:add(S_Sizer, Organic_Button, [{flag, ?wxEXPAND bor ?wxALL}, {border,5}]),	
 	wxSizer:add(S_Sizer, Energy_Button, [{flag, ?wxEXPAND bor ?wxALL}, {border,5}]),	
@@ -156,10 +162,11 @@ start_sim(Cell_size,Input_2, Start_Button,Organic_Button,Energy_Button, Env, Sta
 	% Create a new World_Frame
 	World_Frame = wxFrame:new(wx:null(), 1, "World_Frame",[{size,{Cell_size*Frame_size,Cell_size*Frame_size}}]),
 	% Create a new Organic_Frame
-	Organic_Frame = wxFrame:new(wx:null(), 2, "Organic_Frame",[{size,{Cell_size*Frame_size,Cell_size*Frame_size}}]),
-	% Create a new Organic_Frame
-	Energy_Frame = wxFrame:new(wx:null(), 3, "Energy_Frame",[{size,{Cell_size*Frame_size,Cell_size*Frame_size}}]),	
-	
+	Organic_Frame = wxFrame:new(wx:null(), 2, "Organic_Frame",[{size,{Cell_size*Frame_size + Cell_size*Frame_size div 3,Cell_size*Frame_size}}]),
+	% Create a new Energy_Frame
+	Energy_Frame = wxFrame:new(wx:null(), 3, "Energy_Frame",[{size,{Cell_size*Frame_size + Cell_size*Frame_size div 3,Cell_size*Frame_size}}]),	
+
+			
 	% Load and scale the cells images from file
 	General = wxImage:new("general.png"),
 	Generalc = wxImage:scale(General,Cell_size,Cell_size),
@@ -190,42 +197,89 @@ start_sim(Cell_size,Input_2, Start_Button,Organic_Button,Energy_Button, Env, Sta
     	BmpRoot = wxBitmap:new(Rootc),
   	wxImage:destroy(Root),
   	wxImage:destroy(Rootc),	
+  	
+  	H1 = wxImage:new("1.png"),
+	H1c = wxImage:scale(H1,Cell_size,Cell_size),
+    	BmpH1 = wxBitmap:new(H1c),
+  	wxImage:destroy(H1),
+  	wxImage:destroy(H1c),	
+  	
+  	H2 = wxImage:new("2.png"),
+	H2c = wxImage:scale(H2,Cell_size,Cell_size),
+    	BmpH2 = wxBitmap:new(H2c),
+  	wxImage:destroy(H2),
+  	wxImage:destroy(H2c),	
 	
+	H3 = wxImage:new("3.png"),
+	H3c = wxImage:scale(H3,Cell_size,Cell_size),
+    	BmpH3 = wxBitmap:new(H3c),
+  	wxImage:destroy(H3),
+  	wxImage:destroy(H3c),	
+  	
+  	H4 = wxImage:new("4.png"),
+	H4c = wxImage:scale(H4,Cell_size,Cell_size),
+    	BmpH4 = wxBitmap:new(H4c),
+  	wxImage:destroy(H4),
+  	wxImage:destroy(H4c),	
+  	
+  	H5 = wxImage:new("5.png"),
+	H5c = wxImage:scale(H5,Cell_size,Cell_size),
+    	BmpH5 = wxBitmap:new(H5c),
+  	wxImage:destroy(H5),
+  	wxImage:destroy(H5c),	
+  	
+  	H6 = wxImage:new("6.png"),
+	H6c = wxImage:scale(H6,Cell_size,Cell_size),
+    	BmpH6 = wxBitmap:new(H6c),
+  	wxImage:destroy(H6),
+  	wxImage:destroy(H6c),	
+  	
+  	Scale = wxImage:new("scale.png"),
+	Scalec = wxImage:scale(Scale, Cell_size*Frame_size div 3, Cell_size*Frame_size),
+    	BmpScale = wxBitmap:new(Scalec),
+  	wxImage:destroy(Scale),
+  	wxImage:destroy(Scalec),
+  	
+  	wxStaticBitmap:new(Organic_Frame,?wxID_ANY , BmpScale, [{pos,{Cell_size*Frame_size + (Cell_size*Frame_size div 3) div 2, 5}}]),
+  	wxStaticBitmap:new(Energy_Frame,?wxID_ANY , BmpScale, [{pos,{Cell_size*Frame_size + (Cell_size*Frame_size div 3) div 2, 5}}]),
+  	
 	% Show the World_Frame to display the canvas
-	display_loop(Frame_size, Cell_size, Start_Button,Organic_Button,Energy_Button, World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf, BmpAntena, BmpRoot,0).
+	display_loop(Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, 0).
 
 %------------------------------------------------------------------display_loop ------------------------------------------------------------------------------------	
 		
 		
 %% Function to continuously update and display the Sim World
 
-display_loop(Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, 0) ->
+display_loop(Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, 0) ->
 	wxFrame:show(World_Frame),
 	
 	wxButton:connect(Organic_Button, command_button_clicked, [{callback, fun organic_handle_click/2}, {userData, #{env => wx:get_env(), organic_frame => Organic_Frame}}]),
 	wxButton:connect(Energy_Button, command_button_clicked, [{callback, fun energy_handle_click/2}, {userData, #{env => wx:get_env(), energy_frame => Energy_Frame}}]),
+		
+	display_loop(Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, 1);
 	
-	
-	display_loop(Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button, World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf, BmpAntena, BmpRoot, 1);
-	
-display_loop(Frame_size, Cell_size, Start_Button,Organic_Button,Energy_Button, World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf, BmpAntena, BmpRoot, 1) ->
+display_loop(Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, 1) ->
 			
 			% Clear the canvas by destroying all children of the World_Frame
 			% Print the updated cells on the canvas
-			Num_of_cells = print_cells(World_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot), %add arg - list of elements
+			Num_of_cells = print_cells(World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6), %add arg - list of elements
 			% Refresh the canvas to display the changes
 			wxTextCtrl:setValue(S_Stat_1, integer_to_list(Num_of_cells)),
 			wxWindow:refresh(World_Frame),
 			wxWindow:refresh(Stats_Frame),
+			wxWindow:refresh(Energy_Frame),
+			wxWindow:refresh(Organic_Frame),
+			wxWindow:refresh(Stats_Frame),
 			% Introduce a delay for animation effect
 			% Recursive call to continue the loop
-			display_loop(Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button, World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf, BmpAntena, BmpRoot, 1).
+			display_loop(Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, 1).
 			
 %-------------------------------------------------receive block and printing the cells on the frame ---------------------------------------------------------------------
 
 
 %% Function to print cells on the canvas based on received from the graphic node
-print_cells(World_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot) ->
+print_cells(World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6) ->
 	receive
 		{kill} -> 
 			wxFrame:destroy(World_Frame),
@@ -237,38 +291,102 @@ print_cells(World_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , B
 		%%ETS line [{{X_coordinate,Y_coordinate},{{EnvOrganic,EnvEnergy},{cell_type,energy,organic,TTL,cells_created,wooded}}},{...},{...}] no cell = none
 		List -> 
 			wxWindow:destroyChildren(World_Frame),
-			Counter = insert_cells(List, World_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, 0),
+			Counter = insert_cells(List, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, 0),
 			Counter			
 	end.
 	
 
 %%Function to create and print the cell objs on the world frame
-insert_cells([], _World_Frame, _Cell_size, _BmpGeneral, _BmpSeed, _BmpLeaf , _BmpAntena , _BmpRoot, Counter) ->
+insert_cells([], _World_Frame,_Organic_Frame, _Energy_Frame, _Cell_size, _BmpGeneral, _BmpSeed, _BmpLeaf , _BmpAntena , _BmpRoot, _BmpH1, _BmpH2, _BmpH3, _BmpH4, _BmpH5, _BmpH6, Counter) ->
 	Counter;
 
-insert_cells([{{X_axis,Y_axis},{{_EnvOrganic,_EnvEnergy},{Cell_type,_Energy,_Organic,_TTL,_Cells_created,_Wooded}}}|T], World_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, Counter) ->
-
+insert_cells([{{X_axis,Y_axis},{{EnvOrganic,EnvEnergy},{Cell_type,_Energy,_Organic,_TTL,_Cells_created,_Wooded}}}|T], World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter) ->
+	
 	case Cell_type of
-		none ->	
-			insert_cells(T, World_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, Counter);
+		none ->
+			if
+			EnvOrganic > 0 ->
+				if 
+					EnvOrganic > 25 ->
+						wxStaticBitmap:new(Organic_Frame,?wxID_ANY , BmpH1, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
+						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
+					
+					EnvOrganic > 20 ->
+						wxStaticBitmap:new(Organic_Frame,?wxID_ANY , BmpH2, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
+						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
+						
+					EnvOrganic > 15 ->
+						wxStaticBitmap:new(Organic_Frame,?wxID_ANY , BmpH3, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
+						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
+						
+					EnvOrganic > 10 ->
+						wxStaticBitmap:new(Organic_Frame,?wxID_ANY , BmpH4, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
+						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
+						
+					EnvOrganic > 5 ->
+						wxStaticBitmap:new(Organic_Frame,?wxID_ANY , BmpH5, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
+						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
+						
+					EnvOrganic > 0 ->
+						wxStaticBitmap:new(Organic_Frame,?wxID_ANY , BmpH6, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
+						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter)
+						
+				end;
+				
+				
+			EnvEnergy > 0 ->	
+				if
+					EnvEnergy > 25 ->
+						wxStaticBitmap:new(Energy_Frame,?wxID_ANY , BmpH1, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
+						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
+						
+					EnvEnergy > 20 ->
+						wxStaticBitmap:new(Energy_Frame,?wxID_ANY , BmpH2, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
+						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
+						
+					EnvEnergy > 15 ->
+
+						wxStaticBitmap:new(Energy_Frame,?wxID_ANY , BmpH3, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
+						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
+						
+					EnvEnergy > 10 ->
+
+						wxStaticBitmap:new(Energy_Frame,?wxID_ANY , BmpH4, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
+						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
+						
+					EnvEnergy > 5 ->
+
+						wxStaticBitmap:new(Energy_Frame,?wxID_ANY , BmpH5, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
+						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
+						
+					EnvEnergy > 0 ->
+
+						wxStaticBitmap:new(Energy_Frame,?wxID_ANY , BmpH6, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
+						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter)
+						
+				end;
+				
+			true ->
+						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter)
+			end;
+			
+	
 		general_cell ->
 			wxStaticBitmap:new(World_Frame,?wxID_ANY , BmpGeneral, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-			insert_cells(T, World_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, Counter + 1);
+			insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter + 1);
 		seed_cell ->
 			wxStaticBitmap:new(World_Frame, ?wxID_ANY, BmpSeed, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-			insert_cells(T, World_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, Counter + 1);
+			insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter + 1);
 		leaf_cell ->
 			wxStaticBitmap:new(World_Frame, ?wxID_ANY, BmpLeaf, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-			insert_cells(T, World_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, Counter + 1);
+			insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter + 1);
 		antena_cell ->
 			wxStaticBitmap:new(World_Frame, ?wxID_ANY, BmpAntena, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-			insert_cells(T, World_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, Counter + 1);
+			insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter + 1);
 		root_cell ->
 			wxStaticBitmap:new(World_Frame, ?wxID_ANY, BmpRoot, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-			insert_cells(T, World_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, Counter + 1)
+			insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter + 1)
 	end.
-
-
 
 
 
