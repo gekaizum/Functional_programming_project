@@ -32,7 +32,7 @@ code_change(_,_,_) -> {ok,normal}.
 %%/////////////////////////////////////////////////////Handlers of type call///////////////////////////////////////////////////////////
 %%/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 %%Coordinates is out of range of current node
-handle_call({move,X_axis,Y_axis,FromX,FromY},From,{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}) when ((Y_axis>Ymax) or (Y_axis<Ymin)) -> %1.Move
+handle_call({move,X_axis,Y_axis,FromX,FromY},{From,_Tag},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}) when ((Y_axis>Ymax) or (Y_axis<Ymin)) -> %1.Move
 		loggerp!{cellInfo,"Cell Manager Handle call: Move out of node"},
 		if ((X_axis>Xmax) or (X_axis<Xmin)) -> 
 					NewPos_x=x_axisRepair(Xmin,Xmax,X_axis);
@@ -40,7 +40,7 @@ handle_call({move,X_axis,Y_axis,FromX,FromY},From,{Xmin,Ymin,Xmax,Ymax,ETS_name,
 		end,
 		%%ETS line [{{X_coordinate,Y_coordinate},{{EnvOrganic,EnvEnergy},{cell_type,energy,organic,TTL,cells_created,wooded}}}]
 		[{_,{_,H}}]=ets:lookup(ETS_name,{FromX,FromY}),%check place in ETS %H={Cell_type,Energy,Organic,TTL,Cells_created,Wooded}
-		(global:whereis_name(Node_name))!{moveout,From,NewPos_x,Y_axis,H}, %send message to general node
+		(global:whereis_name(Node_name))!{moveout,From,NewPos_x,Y_axis,FromX,FromY,H}, %send message to general node
 		%receive
 		%	{ok,New_X_axis,New_Y_axis} -> {reply,{New_X_axis,New_Y_axis},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}};%process will migrate to new position
 		%	{reject,_New_X_axis,_New_Y_axis} -> {reply,{FromX,FromY},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}}%rejected
@@ -76,7 +76,7 @@ handle_call({move,X_axis,Y_axis,FromX,FromY},_From,{Xmin,Ymin,Xmax,Ymax,ETS_name
 			_ ->	{reply,{FromX,FromY},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}} %reject
 		end;
 %%------------------------------------------------------------------------------------------------------------------------------------
-handle_call({movein,X_axis,Y_axis,{Cell_type,Energy,Organic,TTL,Cells_created,Wooded}},_From,{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}) -> %1.Movein from outside
+handle_call({movein,X_axis,Y_axis,FromX,FromY,{Cell_type,Energy,Organic,TTL,Cells_created,Wooded}},_From,{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}) -> %1.Movein from outside
 			loggerp!"Cell Manager Handle call: Move in",
 			case ets:lookup(ETS_name,{X_axis,Y_axis}) of %check if move can be done
 			[{{X_axis,Y_axis},{{EnvOrganic,EnvEnergy},{none,_,_,_,_,_}}}] -> %yes place is empty
@@ -85,8 +85,8 @@ handle_call({movein,X_axis,Y_axis,{Cell_type,Energy,Organic,TTL,Cells_created,Wo
 					%spawn process
 					CellID=spawn(general_cell_funcs,Cell_type,[Energy,Organic,Cells_created,Wooded,{X_axis,Y_axis},ETS_name,TTL]),
 					cell_monitor!{add,CellID},%Send ID to cells_monitor
-					{reply,{answer,ok,X_axis,Y_axis},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}}; %ok
-			_ ->	{reply,{answer,reject,X_axis,Y_axis},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}} %reject
+					{reply,{answer,ok,X_axis,Y_axis,FromX,FromY},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}}; %ok
+			_ ->	{reply,{answer,reject,X_axis,Y_axis,FromX,FromY},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}} %reject
 			end;
 %%------------------------------------------------------------------------------------------------------------------------------------
 %%------------------------------------------------------------------------------------------------------------------------------------
@@ -161,7 +161,7 @@ handle_call({create,X_coordinate,Y_coordinate,Type},_From,{Xmin,Ymin,Xmax,Ymax,E
 handle_call({restart,NewYmin,NewYmax,New_ETS_name},_From,{Xmin,_Ymin,Xmax,_Ymax,ETS_name,Node_name}) ->
 			loggerp!"Cell Manager Handle call: Restart",
 			restart_mailbox2(),%clean mailbox
-			cell_monitor!{restart},
+			%cell_monitor!{restart},
 			restart_mailbox(),
 			Cell_monitor=spawn(cell_manager,cell_monitor,[[],Node_name]),%Need to create cells_monitor and register it locally
 			register(cell_monitor,Cell_monitor),
@@ -206,15 +206,15 @@ handle_info({init,Cells_Amount,{Xmin,Ymin,Xmax,Ymax},Energy,Organic,ETS_name,Nod
 			loggerp!{cell_manager,ok},
 			{noreply,{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}};
 %%------------------------------------------------------------------------------------------------------------------------------------
-handle_info({Answer,X_axis,Y_axis,ID},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}) -> %transport process answer
+handle_info({Answer,X_axis,Y_axis,ID,FromX,FromY},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}) -> %transport process answer
 			loggerp!"Cell Manager Handle info: Answer",
 			if  Answer==reject -> ok;%rejected
 				Answer==ok -> %process will migrate to new position
 					cell_monitor!{delete,ID},%delete process
 					%clean ets:line
-					[{_,{{EnvOrganicOld,EnvEnergyOld},_}}]=ets:lookup(ETS_name,{X_axis,Y_axis}),
-					ets:delete(ETS_name,{X_axis,Y_axis}),
-					ets:insert(ETS_name,{{X_axis,Y_axis},{{EnvOrganicOld,EnvEnergyOld},{none,0,0,0,0,0}}})
+					[{_,{{EnvOrganicOld,EnvEnergyOld},_}}]=ets:lookup(ETS_name,{FromX,FromY}),
+					ets:delete(ETS_name,{FromX,FromY}),
+					ets:insert(ETS_name,{{FromX,FromY},{{EnvOrganicOld,EnvEnergyOld},{none,0,0,0,0,0}}})
 			end,
 			{noreply,{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}}.
 %%/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
