@@ -90,7 +90,7 @@ handle_info({moveout,ProcID,X_axis,Y_axis,H},{Xmin,Ymin,Xmax,Ymax,ETS_name,My_na
 			%%ETS line [{{X_coordinate,Y_coordinate},{{EnvOrganic,EnvEnergy},{cell_type,energy,organic,TTL,cells_created,wooded}}}]
 			NextNodeName=check_next_node(Y_axis,Ymax,My_name,NodeNameList),
 			if NextNodeName == My_name -> ok;
-			true -> NextNodeName!{movein,ProcID,My_name,X_axis,Y_axis,H}
+			true -> global:whereis_name(NextNodeName)!{movein,ProcID,My_name,X_axis,Y_axis,H}
 			end,
 			{noreply,{Xmin,Ymin,Xmax,Ymax,ETS_name,My_name,NodeNameList,MailboxID}};
 %%------------------------------------------------------------------------------------------------------------------------------------
@@ -101,7 +101,7 @@ handle_info({movein,ProcID,NodeName,X_axis,Y_axis,H},{Xmin,Ymin,Xmax,Ymax,ETS_na
 			true -> NewPos_y=Y_axis
 			end,
 			{_,Answer,_,_}=gen_server:call(cell_manager,{movein,X_axis,NewPos_y,H}),
-			NodeName!{answer,Answer,ProcID,X_axis,NewPos_y,H},
+			global:whereis_name(NodeName)!{answer,Answer,ProcID,X_axis,NewPos_y,H},
 			{noreply,{Xmin,Ymin,Xmax,Ymax,ETS_name,My_name,NodeNameList,MailboxID}};
 %%------------------------------------------------------------------------------------------------------------------------------------
 %%node answer about sending a cell to it
@@ -141,14 +141,15 @@ check_next_node(Y_axis,Ymax,My_name,NodeNameList) ->
 			Index=find_node(My_name,NodeNameList,1),
 			if  (length(NodeNameList)==1) -> My_name;
 				((Y_axis>Ymax) and (Index<length(NodeNameList))) ->
-					lists:member(Index+1,NodeNameList);
-				(Y_axis>Ymax) -> lists:member(1,NodeNameList);
-				(Index==1) -> lists:member(length(NodeNameList),NodeNameList);
-				true -> lists:member(Index-1,NodeNameList)
+					list_member(Index+1,NodeNameList,1);
+				(Y_axis>Ymax) -> list_member(1,NodeNameList,1);
+				(Index==1) -> list_member(length(NodeNameList),NodeNameList,1);
+				true -> list_member(Index-1,NodeNameList,1)
 			end.
 find_node(My_name,[H|T],Counter) -> 
 			if H==My_name -> Counter;
 			true -> find_node(My_name,T,Counter+1)
 			end.
 %%------------------------------------------------------------------------------------------------------------------------------------
-%start2(My_name) -> start(My_name).
+list_member(Index,[H|_],Counter) -> H;
+list_member(Index,[_|T],Counter) -> list_member(Index,T,Counter+1).
