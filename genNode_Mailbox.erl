@@ -26,7 +26,7 @@ genNode_Mailbox_loop(ETS_name,Node_name,AckStatus,Host_name) ->
 						loggerp!{no_c},
 						cell_monitor!{restart},
 						%cell_manager:cast(cell_manager,stop),%terminate cell_manager
-						general_node:cast(general_node,stop);%terminate general_node
+						gen_server:cast(general_node,stop);%terminate general_node
 					true -> %no connetion
 						ID!{keepalive,Host_name,genNode_Mailbox,ets:tab2list(ETS_name)},
 						%rpc:call('graphic_node@127.0.0.1', graphic_node, msg_delivery, [main_node,{keepalive,Node_name,self(),ets:tab2list(ETS_name)}]),
