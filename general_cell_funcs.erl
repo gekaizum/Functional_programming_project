@@ -123,8 +123,8 @@ weight_calc(EnvEnergy,EnvOrganic,Energy,Organic,_Cells_created,PrioritiesAct) ->
 weight_calc(EnvEnergy,EnvOrganic,Energy,Organic,[A,B,C,D,E]) -> 
 													if  (Organic+EnvOrganic) > ?MAX_ORGANIC -> weight_calc([A,B+E/2,C,D,E/2],[2,2,2,10]);
 														(Energy+EnvEnergy) > ?MAX_ENERGY -> weight_calc([A,B+E/2,C,D,E/2],[2,2,10,2]);
-														(Energy+EnvEnergy) < 3 -> weight_calc([A/2,B+E/2,C+A/2+D/2,D/2,E/2],[5,5,3,3]);
-														(Energy+EnvEnergy) >= 10 -> weight_calc([A,B/2,C,D+B/2,E],[4,4,4,4]);
-														true -> weight_calc([A,B,C,D,E],[5,5,3,3])
+														(Energy+EnvEnergy) < 3 -> weight_calc([A/2,B+E/2,C+A/2+D/2,D/2,E/2],[4,8,2,2]);
+														(Energy+EnvEnergy) >= 10 -> weight_calc([A,B/2,C,D+B/2,E],[3,7,3,3]);
+														true -> weight_calc([A,B,C,D,E],[4,8,2,2])
 													end.
 %%/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////				
