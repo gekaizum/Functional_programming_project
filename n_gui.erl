@@ -147,7 +147,7 @@ start() ->
 
 %% after click on start button - this func builds the world and start the simulation 
 start_sim(Cell_size,Input_2, Start_Button,Organic_Button,Energy_Button, Env, Stats_Frame, S_Stat_1) ->
-	io:format("~nSimulation started~n",[]),
+	%io:format("~nSimulation started~n",[]),
 	register(sim_gui, self()),
 	(global:whereis_name(main_node)) ! {start},
 	
@@ -405,7 +405,7 @@ init_handle_click(#wx{obj = _Init_Button, userData = #{input_1 := Input_1,input_
 	Organic = list_to_integer(wxTextCtrl:getValue(Input_5)),
 	EnvEnergy = list_to_integer(wxTextCtrl:getValue(Input_6)),
 	EnvOrganic = list_to_integer(wxTextCtrl:getValue(Input_7)),
-	graphic_node:start([BoardSize,TotalProcNum,ListOfNodeNames,[node1],Energy,Organic,EnvEnergy,EnvOrganic]), %ListOfNodeNames=[]
+	graphic_node:start([BoardSize,TotalProcNum,['node1@127.0.0.1','node2@127.0.0.1'],[node1,node2],Energy,Organic,EnvEnergy,EnvOrganic]), %ListOfNodeNames=[]
 	wxFrame:hide(Init_Frame),
 	wxFrame:show(Stats_Frame).
 
@@ -418,36 +418,36 @@ start_handle_click(#wx{obj = Start_Button,userData = #{ input_2 := Input_2, env 
 		"Start" ->	
 			wxButton:setLabel(Start_Button, "Stop"),
 			Val = list_to_integer(wxTextCtrl:getValue(Input_2)),
-			io:format("~nBoardSize= ~w~n",[Val]),
-			io:format("~nStart Pressed,Val=~n",[]),
+			%io:format("~nBoardSize= ~w~n",[Val]),
+			%io:format("~nStart Pressed,Val=~n",[]),
 			if
 				Val > 108 ->
-					io:format("~n108~n",[]),
+					%io:format("~n108~n",[]),
 					Cell_size = 10,
 					wxTextCtrl:setValue(Input_2, integer_to_list(108)),
 					UD_Input_2 = 108,
-					io:format("~nSpawn start sim~n",[]),
+					%io:format("~nSpawn start sim~n",[]),
 					spawn(?MODULE, start_sim, [Cell_size , UD_Input_2, Start_Button,Organic_Button,Energy_Button, Env,Stats_Frame,S_Stat_1]);
 				Val > 54 ->
-					io:format("~n54~n",[]),
+					%io:format("~n54~n",[]),
 					% Spawn a new process to start the simulation	
 					Cell_size = 10,
 					UD_Input_2 = list_to_integer(wxTextCtrl:getValue(Input_2)),
-					io:format("~nSpawn start sim~n",[]),
+					%io:format("~nSpawn start sim~n",[]),
 					spawn(?MODULE, start_sim, [Cell_size ,UD_Input_2, Start_Button,Organic_Button,Energy_Button, Env,Stats_Frame,S_Stat_1]);	
 				Val > 27 ->
-					io:format("~n27~n",[]),
+					%io:format("~n27~n",[]),
 					% Spawn a new process to start the simulation	
 					Cell_size = 20,
 					UD_Input_2 = list_to_integer(wxTextCtrl:getValue(Input_2)),
-					io:format("~nSpawn start sim~n",[]),
+					%io:format("~nSpawn start sim~n",[]),
 					spawn(?MODULE, start_sim, [Cell_size ,UD_Input_2, Start_Button,Organic_Button,Energy_Button, Env,Stats_Frame,S_Stat_1]);
 
 				true ->
-					io:format("~n < 27~n",[]),
+					%io:format("~n < 27~n",[]),
 					Cell_size = ?CELL_SIZE,
 					UD_Input_2 = list_to_integer(wxTextCtrl:getValue(Input_2)),
-					io:format("~nSpawn start sim~n",[]),
+					%io:format("~nSpawn start sim~n",[]),
 					spawn(?MODULE, start_sim, [Cell_size ,UD_Input_2, Start_Button,Organic_Button,Energy_Button, Env,Stats_Frame,S_Stat_1])		
 			end;
 		"Stop" ->
@@ -455,9 +455,9 @@ start_handle_click(#wx{obj = Start_Button,userData = #{ input_2 := Input_2, env 
 			%io:format("~nStop sim~n",[]),
 			% Enable input fields and change Start_Button label to "Start"
 			whereis(sim_gui) ! {kill},
-			io:format("~nMessage to stop frame sent~n",[]),
+			%io:format("~nMessage to stop frame sent~n",[]),
 			(global:whereis_name(main_node))!{stop},
-			io:format("~nMessage to stop main_node sent~n",[]),
+			%io:format("~nMessage to stop main_node sent~n",[]),
 			%wx:destroy(),
 			%spawn(?MODULE, start, []),
 			exit(self())
