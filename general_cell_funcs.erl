@@ -38,9 +38,11 @@ general_cell_loop(Energy,Organic,Cells_created,Woodded,{X_coordinate,Y_coordinat
 								
 		end,
 		{New_Actions_array,New_Transform_array}=weight_calc(EnvEnergy,EnvOrganic,Energy,Organic,Cells_created,Woodded),
-		if Organic>0 , Energy=<10 -> 	%transform organic into energy
-										NewOrganic=Organic-1,
-										NewEnergy=Energy+1
+		if Organic>0 , Energy=<15 -> 	%transform organic into energy
+			NewOrganic=Organic-1,
+			NewEnergy=Energy+1;
+		true -> NewOrganic=Organic,
+			NewEnergy=Energy
 		end,
 		Random=rand:uniform(?TOTAL_WEIGHT_ACTION),
 		Action=select_item(Actions_array,Random), %choose random action
