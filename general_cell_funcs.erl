@@ -30,7 +30,7 @@ general_cell_loop(Energy,Organic,Cells_created,Woodded,{X_coordinate,Y_coordinat
 		[{_,{{EnvEnergy,EnvOrganic},_}}]=ets:lookup(ETS_name,{X_coordinate,Y_coordinate}),%check place in ETS
 		receive %wait for timeout
 			{restart} -> exit(self())
-			after ?EVENT_TIME -> if ((Energy+EnvEnergy) > ?MAX_ENERGY) or (Organic > ?MAX_ORGANIC) or (Energy=<0)-> %check if alive
+			after ?EVENT_TIME -> if ((((Energy+EnvEnergy) > ?MAX_ENERGY) or (Organic > ?MAX_ORGANIC)) or (Energy=<0))-> %check if alive
 																		cell_manager!{die,X_coordinate,Y_coordinate,Organic,Energy}, %inform manager
 																		exit(self()); 
 						 true -> ok %keep going
