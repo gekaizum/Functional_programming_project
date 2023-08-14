@@ -81,7 +81,7 @@ handle_info({keepalive,Host,From,ETS_List},{BoardSize,ListOfNodeNames,ListOfServ
 %%/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 terminate(_Reason, {_BoardSize,ListOfNodeNames,_ListOfServerNames,_TotalProcNum,_ETS_name}) ->   
 			node_monitoring!{stop},
-			host_terminating(ListOfNodeNames),
+			host_terminating(ListOfNodeNames,ListOfServerNames),
 			logger_main!{stop,ok},
 			ok.
 %%/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -132,11 +132,11 @@ node_starter([H1|T1],[H2|T2]) -> %activates servers at given nodes
 			node_monitoring!{add,H1},
 			node_starter(T1,T2).
 %%------------------------------------------------------------------------------------------------------------------------------------
-host_terminating([]) -> ok;
-host_terminating([H|T]) ->
-			rpc:call(H, general_node, terminate, [ok,ok]),%Starting server
-			logger_main!{terminating,H},
-			host_terminating(T).
+host_terminating([],_) -> ok;
+host_terminating([H1|T1],[H2|T2]) ->
+			rpc:call(H1, general_node, stop, [(global:whereis_name(H2))]),%Starting server
+			logger_main!{terminating,H1},
+			host_terminating(T1,T2).
 %%------------------------------------------------------------------------------------------------------------------------------------
 %handle_call({restart,Data,NewYmin,NewYmax}
 restart_function(_BoardSize,[],_List,_ETS_name) -> ok;
