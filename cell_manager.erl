@@ -138,11 +138,11 @@ handle_call({create,X_coordinate,Y_coordinate,Type},_From,{Xmin,Ymin,Xmax,Ymax,E
 				{reply,{reject,0},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}};
 			true -> 
 				Ttl=rand:uniform(15)+5,
-				if Type == general_cell -> Wooded=0,
-							Module_type=general_cell_funcs;
-				true -> Wooded=1,
-						Module_type=cell_funcs
+				if Type == seed_cell -> Wooded=0;
+							%Module_type=general_cell_funcs;
+				true -> Wooded=1
 				end,
+				Module_type=cell_funcs,
 				[{_,{{EnvOrganic,EnvEnergy},_}}]=ets:lookup(ETS_name,{X_axis,Y_axis}),
 				ets:delete(ETS_name,{X_axis,Y_axis}),
 				ets:insert(ETS_name,{{X_axis,Y_axis},{{EnvOrganic,EnvEnergy},{Type,5,5,Ttl,0,Wooded}}}),
