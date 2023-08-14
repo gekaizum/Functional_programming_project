@@ -47,7 +47,7 @@ handle_call({restart,Data,NewYmin,NewYmax,ActiveHosts},_From,{Xmin,_Ymin,Xmax,_Y
 	%{init,NodeNameList,Cells_Amount,{Xmin,Ymin,Xmax,Ymax},Energy,Organic,EnvEnergy,EnvOrganic}
 	cell_monitor!{restart},%Ask cells_monitor to delete all cells
 	ets:delete(ETS_name),%delete old ets
-	New_ETS_name=ets:new(local_table,[named_table,read_concurency,set,public]),
+	New_ETS_name=ets:new(local_table,[named_table,{read_concurrency,true},set,public]),
 	MailboxID!{restart,New_ETS_name},
 	ets_update(Data,New_ETS_name),
 	gen_server:call(cell_manager,{restart,NewYmin,NewYmax,New_ETS_name}),%handle call to cell manager to restart
