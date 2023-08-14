@@ -74,6 +74,10 @@ handle_info({keepalive,Host,From,ETS_List},{BoardSize,ListOfNodeNames,ListOfServ
 			logger_main!{keepalive,Host},
 			ets_changer(ETS_List,ETS_name),
 			logger_main!{update},
+			%whereis(sim_gui)!ets:tab2list(ETS_name),
+			{noreply,{BoardSize,ListOfNodeNames,ListOfServerNames,TotalProcNum,ETS_name}};
+%%------------------------------------------------------------------------------------------------------------------------------------
+handle_info({send_me},{BoardSize,ListOfNodeNames,ListOfServerNames,TotalProcNum,ETS_name}) ->
 			whereis(sim_gui)!ets:tab2list(ETS_name),
 			{noreply,{BoardSize,ListOfNodeNames,ListOfServerNames,TotalProcNum,ETS_name}}.
 %%/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
