@@ -51,8 +51,7 @@ logger_loop(LogFile,Cell_log) ->
 							file:close(Cell_log),
 							file:close(LogFile);
 				{no_c} -> io:format(LogFile,"Connection with graphic node lost~n",[]),
-							file:close(Cell_log),
-							file:close(LogFile);
+							logger_loop(LogFile,Cell_log);
 				{cell_manager,ok} -> 
 									erlang:monitor(process,cell_manager),
 									io:format(LogFile,"Cell Manager Active~n",[]),
