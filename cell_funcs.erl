@@ -90,11 +90,11 @@ antena_cell_loop(Energy,Organic,{X_coordinate,Y_coordinate},Ttl) ->
 			after ?EVENT_TIME -> ok
 			end,
 			New_Ttl=Ttl-1,
-			if (Ttl==0) or (Energy==0) -> 
-									cell_manager!{die,X_coordinate,Y_coordinate,Organic,Energy}, %inform manager
+			if (Ttl==0) or (Energy=<0) -> 
+									cell_manager!{die,X_coordinate,Y_coordinate,Organic,0}, %inform manager
 						 			exit(self());
 				true -> 
-						antena_cell_loop(Energy-1,Organic,{X_coordinate,Y_coordinate},New_Ttl)
+						antena_cell_loop(Energy-3,Organic,{X_coordinate,Y_coordinate},New_Ttl)
 			end.
 %%/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 root_cell(Energy,Organic,_Cells_created,_Woodded,{X_coordinate,Y_coordinate},ETS_name,Ttl) ->
@@ -114,11 +114,11 @@ root_cell_loop(Energy,Organic,{X_coordinate,Y_coordinate},Ttl) ->
 			after ?EVENT_TIME -> ok
 			end,
 			New_Ttl=Ttl-1,
-			if (Ttl==0) or (Energy==0) -> 
+			if (Ttl==0) or (Energy=<0) -> 
 									cell_manager!{die,X_coordinate,Y_coordinate,Organic,Energy}, %inform manager
 						 			exit(self());
-				Organic>0 -> 
-						 root_cell_loop(Energy,Organic-1,{X_coordinate,Y_coordinate},New_Ttl);
+				Organic>=0 -> 
+						 root_cell_loop(Energy,Organic-5,{X_coordinate,Y_coordinate},New_Ttl);
 				true -> 
 						root_cell_loop(Energy-1,Organic,{X_coordinate,Y_coordinate},New_Ttl)
 			end.
