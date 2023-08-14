@@ -76,9 +76,12 @@ general_cell_loop(Energy,Organic,Cells_created,Woodded,{X_coordinate,Y_coordinat
 											Random2=rand:uniform(?TOTAL_WEIGHT_TRANSFORM),
 											RandomChild=select_item(Transform_array,Random2),
 											{Atom,Add_energy}=gen_server:call(cell_manager,{create,X_coordinate,Y_coordinate,RandomChild}),
-											if Atom==ok -> 
-														New_Woodded=1,
-														New_Cells_created=Cells_created+1;
+											if ((Atom==ok) and (RandomChild==seed_cell)) -> 
+												New_Woodded=Woodded,
+												New_Cells_created=Cells_created+1;
+											Atom==ok ->
+												New_Woodded=1,
+												New_Cells_created=Cells_created+1;
 											true -> New_Woodded=Woodded,
 													New_Cells_created=Cells_created
 											end,
