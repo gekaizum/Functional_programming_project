@@ -24,7 +24,7 @@ genNode_Mailbox_loop(ETS_name,Node_name,AckStatus,Host_name) ->
 					ID=(global:whereis_name(main_node)),
 					if (NewAckStatus=<0) -> 
 						loggerp!{no_c},
-						cell_monitor!{restart},
+						%cell_monitor!{restart},
 						%cell_manager:cast(cell_manager,stop),%terminate cell_manager
 						gen_server:cast(general_node,stop);%terminate general_node
 					true -> %no connetion
