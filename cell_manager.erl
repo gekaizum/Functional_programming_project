@@ -147,8 +147,12 @@ handle_call({create,X_coordinate,Y_coordinate,Type},_From,{Xmin,Ymin,Xmax,Ymax,E
 				ets:delete(ETS_name,{X_axis,Y_axis}),
 				ets:insert(ETS_name,{{X_axis,Y_axis},{{EnvOrganic,EnvEnergy},{Type,5,5,Ttl,0,Wooded}}}),
 				CellID=spawn(Module_type,Type,[5,5,0,Wooded,{X_axis,Y_axis},ETS_name,Ttl]),				
-				cell_monitor!{add,CellID},
-				{reply,{ok,-1},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}}
+				ID=whereis(cell_monitor),				
+				if ID==undefined -> 
+					{reply,{reject,0},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}};
+				true -> ID!{add,CellID},
+					{reply,{ok,-1},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}}
+				end
 			end;
 %%------------------------------------------------------------------------------------------------------------------------------------
 %%------------------------------------------------------------------------------------------------------------------------------------
