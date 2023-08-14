@@ -5,8 +5,8 @@
 -export([antena_cell/7]).
 %-export([wood_cell/]).
 -export([root_cell/7]).
--define(MAX_ENERGY,15).
--define(MAX_ORGANIC,15).
+-define(MAX_ENERGY,30).
+-define(MAX_ORGANIC,30).
 -define(EVENT_TIME,1000).
 %-define(TOTAL_WEIGHT_ACTION,25).
 %-define(TOTAL_WEIGHT_TRANSFORM,16).
@@ -58,17 +58,17 @@ seed_cell_loop(Energy,Organic,{X_coordinate,Y_coordinate},ETS_name) ->
 					if Energy < 3 ->
 								%spawn general cell
 								cell_manager!{new_type,X_coordinate,Y_coordinate,general_cell,-1},%inform manager to change type in ETS
-								CellID=spawn(general_cell_funcs,general_cell,[Energy,Organic,0,0,{X_coordinate,Y_coordinate},ETS_name,0]),
+								CellID=spawn(general_cell_funcs,general_cell,[15,Organic,0,0,{X_coordinate,Y_coordinate},ETS_name,0]),
 								cell_monitor!{add,CellID},%Send ID to cells_monitor
 								exit(self());
 						true -> 
 								Random=rand:uniform(10),
 								if Random>5 ->  %spawn general cell
 												cell_manager!{new_type,X_coordinate,Y_coordinate,general_cell,-1},%inform manager to change type in ETS
-												CellID=spawn(general_cell_funcs,general_cell,[Energy,Organic,0,0,{X_coordinate,Y_coordinate},ETS_name,0]),
+												CellID=spawn(general_cell_funcs,general_cell,[15,Organic,0,0,{X_coordinate,Y_coordinate},ETS_name,0]),
 												cell_monitor!{add,CellID},%Send ID to cells_monitor
 												exit(self());
-									true -> seed_cell(Energy-1,Organic,0,0,{X_coordinate,Y_coordinate},ETS_name,0)
+									true -> seed_cell_loop(Energy-1,Organic,{X_coordinate,Y_coordinate},ETS_name)
 								end
 					end
 			end.
@@ -80,7 +80,7 @@ antena_cell(Energy,Organic,_Cells_created,_Woodded,{X_coordinate,Y_coordinate},E
 						exit(self()); %die
 			true ->
 					%Ttl=rand:uniform(15),%calc Time to live
-					cell_manager!{new_type,X_coordinate,Y_coordinate,antena_cell,Ttl},%inform manager to change typy in ETS
+					cell_manager!{new_type,X_coordinate,Y_coordinate,antena_cell,Ttl},%inform manager to change type in ETS
 					antena_cell_loop(Energy+EnvEnergy,Organic,{X_coordinate,Y_coordinate},Ttl)
 			end.
 %%------------------------------------------------------------------------------------------------------------------------------------
@@ -94,7 +94,7 @@ antena_cell_loop(Energy,Organic,{X_coordinate,Y_coordinate},Ttl) ->
 									cell_manager!{die,X_coordinate,Y_coordinate,Organic,Energy}, %inform manager
 						 			exit(self());
 				true -> 
-						leaf_cell_loop(Energy-1,Organic,{X_coordinate,Y_coordinate},New_Ttl)
+						antena_cell_loop(Energy-1,Organic,{X_coordinate,Y_coordinate},New_Ttl)
 			end.
 %%/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 root_cell(Energy,Organic,_Cells_created,_Woodded,{X_coordinate,Y_coordinate},ETS_name,Ttl) ->
@@ -117,7 +117,9 @@ root_cell_loop(Energy,Organic,{X_coordinate,Y_coordinate},Ttl) ->
 			if (Ttl==0) or (Energy==0) -> 
 									cell_manager!{die,X_coordinate,Y_coordinate,Organic,Energy}, %inform manager
 						 			exit(self());
+				Organic>0 -> 
+						 root_cell_loop(Energy,Organic-1,{X_coordinate,Y_coordinate},New_Ttl);
 				true -> 
-						leaf_cell_loop(Energy-1,Organic,{X_coordinate,Y_coordinate},New_Ttl)
+						root_cell_loop(Energy-1,Organic,{X_coordinate,Y_coordinate},New_Ttl)
 			end.
 %%/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
