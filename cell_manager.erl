@@ -5,9 +5,9 @@
 -export([start/0,init/1,handle_call/3,handle_cast/2,handle_info/2,terminate/2,code_change/3]).
 -export([cell_monitor/2]).
 %%------------------------------------------------------------------------------------------------------------------------------------
--define(MAX_ENERGY,15).
--define(MAX_ORGANIC,15).
--define(MAX_CHILDREN,3).
+-define(MAX_ENERGY,25).
+-define(MAX_ORGANIC,25).
+-define(MAX_CHILDREN,8).
 -define(EVENT_TIME,1000).
 %%/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 %%/////////////////////////////////////////////////////gen server init/////////////////////////////////////////////////////////////////
@@ -54,11 +54,11 @@ handle_call({move,X_axis,Y_axis,FromX,FromY},_From,{Xmin,Ymin,Xmax,Ymax,ETS_name
 		NewPos=x_axisRepair(Xmin,Xmax,X_axis),
 		case ets:lookup(ETS_name,{NewPos,Y_axis}) of %check if move can be done
 			[{{NewPos,Y_axis},{{EnvOrganic,EnvEnergy},{none,_,_,_,_,_}}}] -> %yes place is empty					
-				[{_,{{EnvOrganicOld,EnvEnergyOld},{Type,EnergyOld,OrganicOld,TTLOld,Cells_createdOld,WoodedOld}}}]=ets:lookup(ETS_name,{FromX,FromY}),
+				[{_,{{_EnvOrganicOld,_EnvEnergyOld},{Type,EnergyOld,OrganicOld,TTLOld,Cells_createdOld,WoodedOld}}}]=ets:lookup(ETS_name,{FromX,FromY}),
 				ets:delete(ETS_name,{FromX,FromY}), % change ets line
-				ets:insert(ETS_name,{{FromX,FromY},{{EnvOrganicOld,EnvEnergyOld},{none,0,0,0,0,0}}}),
-				ets:delete(ETS_name,{Xmin,Y_axis}),
-				ets:insert(ETS_name,{{Xmin,Y_axis},{{EnvOrganic,EnvEnergy},{Type,EnergyOld,OrganicOld,TTLOld,Cells_createdOld,WoodedOld}}}),
+				ets:insert(ETS_name,{{FromX,FromY},{{2,2},{none,0,0,0,0,0}}}),
+				ets:delete(ETS_name,{NewPos,Y_axis}),
+				ets:insert(ETS_name,{{NewPos,Y_axis},{{EnvOrganic,EnvEnergy},{Type,EnergyOld,OrganicOld,TTLOld,Cells_createdOld,WoodedOld}}}),
 				{reply,{NewPos,Y_axis},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}};
 		_ ->	{reply,{FromX,FromY},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}} %reject
 		end;
@@ -67,9 +67,9 @@ handle_call({move,X_axis,Y_axis,FromX,FromY},_From,{Xmin,Ymin,Xmax,Ymax,ETS_name
 		loggerp!{cellInfo,"Cell Manager Handle call: Move"},
 		case ets:lookup(ETS_name,{X_axis,Y_axis}) of %check if move can be done
 			[{{X_axis,Y_axis},{{EnvOrganic,EnvEnergy},{none,_,_,_,_,_}}}] -> %yes place is empty					
-				[{_,{{EnvOrganicOld,EnvEnergyOld},{Type,EnergyOld,OrganicOld,TTLOld,Cells_createdOld,WoodedOld}}}]=ets:lookup(ETS_name,{FromX,FromY}),
+				[{_,{{_EnvOrganicOld,_EnvEnergyOld},{Type,EnergyOld,OrganicOld,TTLOld,Cells_createdOld,WoodedOld}}}]=ets:lookup(ETS_name,{FromX,FromY}),
 					ets:delete(ETS_name,{FromX,FromY}), % change ets line
-					ets:insert(ETS_name,{{FromX,FromY},{{EnvOrganicOld,EnvEnergyOld},{none,0,0,0,0,0}}}),
+					ets:insert(ETS_name,{{FromX,FromY},{{2,2},{none,0,0,0,0,0}}}),
 					ets:delete(ETS_name,{X_axis,Y_axis}),
 					ets:insert(ETS_name,{{X_axis,Y_axis},{{EnvOrganic,EnvEnergy},{Type,EnergyOld,OrganicOld,TTLOld,Cells_createdOld,WoodedOld}}}),
 					{reply,{X_axis,Y_axis},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}}; %ok
@@ -137,7 +137,7 @@ handle_call({create,X_coordinate,Y_coordinate,Type},_From,{Xmin,Ymin,Xmax,Ymax,E
 			if X_axis == -1 ->
 				{reply,{reject,0},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}};
 			true -> 
-				Ttl=rand:uniform(15)+5,
+				Ttl=rand:uniform(15)+15,
 				if Type == seed_cell -> Wooded=0;
 							%Module_type=general_cell_funcs;
 				true -> Wooded=1
@@ -145,10 +145,11 @@ handle_call({create,X_coordinate,Y_coordinate,Type},_From,{Xmin,Ymin,Xmax,Ymax,E
 				Module_type=cell_funcs,
 				[{_,{{EnvOrganic,EnvEnergy},_}}]=ets:lookup(ETS_name,{X_axis,Y_axis}),
 				ets:delete(ETS_name,{X_axis,Y_axis}),
-				ets:insert(ETS_name,{{X_axis,Y_axis},{{EnvOrganic,EnvEnergy},{Type,5,5,Ttl,0,Wooded}}}),
-				CellID=spawn(Module_type,Type,[5,5,0,Wooded,{X_axis,Y_axis},ETS_name,Ttl]),				
+				ets:insert(ETS_name,{{X_axis,Y_axis},{{EnvOrganic,EnvEnergy},{Type,10,10,Ttl,0,Wooded}}}),
+				CellID=spawn(Module_type,Type,[10,10,0,Wooded,{X_axis,Y_axis},ETS_name,Ttl]),				
 				ID=whereis(cell_monitor),				
 				if ID==undefined -> 
+					io:format("~nCell monitor not found~n",[]),
 					{reply,{reject,0},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}};
 				true -> ID!{add,CellID},
 					{reply,{ok,-1},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}}
@@ -187,9 +188,9 @@ handle_cast(stop,{Xmin,_Ymin,Xmax,_Ymax,ETS_name,Node_name}) ->
 %%/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 handle_info({die,X_axis,Y_axis,Organic,Energy},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}) -> %1.cell dies
 			loggerp!{cellInfo,"Cell Manager Handle info: Die"},
-			[{_,{{EnvOrganicOld,EnvEnergyOld},_}}]=ets:lookup(ETS_name,{X_axis,Y_axis}),
+			[{_,{{_EnvOrganicOld,_EnvEnergyOld},_}}]=ets:lookup(ETS_name,{X_axis,Y_axis}),
 			ets:delete(ETS_name,{X_axis,Y_axis}),%delete ets line
-			ets:insert(ETS_name,{{X_axis,Y_axis},{{EnvOrganicOld+Organic,EnvEnergyOld+Energy},{none,0,0,0,0,0}}}),
+			ets:insert(ETS_name,{{X_axis,Y_axis},{{Organic div 2,Energy},{none,0,0,0,0,0}}}),
 			{noreply,{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}};
 %%------------------------------------------------------------------------------------------------------------------------------------
 handle_info({new_type,X_axis,Y_axis,Type,Ttl},{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}) -> %2.new_type of cell in {X,Y}
@@ -216,9 +217,9 @@ handle_info({Answer,_X_axis,_Y_axis,ID,Prev_x,Prev_y},{Xmin,Ymin,Xmax,Ymax,ETS_n
 				Answer==ok -> %process will migrate to new position
 					cell_monitor!{delete,ID},%delete process
 					%clean ets:line
-					[{_,{{EnvOrganicOld,EnvEnergyOld},_}}]=ets:lookup(ETS_name,{Prev_x,Prev_y}),
+					[{_,{{_EnvOrganicOld,_EnvEnergyOld},_}}]=ets:lookup(ETS_name,{Prev_x,Prev_y}),
 					ets:delete(ETS_name,{Prev_x,Prev_y}),
-					ets:insert(ETS_name,{{Prev_x,Prev_y},{{EnvOrganicOld,EnvEnergyOld},{none,0,0,0,0,0}}})
+					ets:insert(ETS_name,{{Prev_x,Prev_y},{{2,2},{none,0,0,0,0,0}}})
 			end,
 			{noreply,{Xmin,Ymin,Xmax,Ymax,ETS_name,Node_name}}.
 %%/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
