@@ -22,10 +22,10 @@ genNode_Mailbox_loop(ETS_name,Node_name,AckStatus,Host_name) ->
 		after 1000 -> %send ets to graphic node, it is also keepalive message
 					NewAckStatus=AckStatus-1,
 					ID=(global:whereis_name(main_node)),
-					if ((NewAckStatus=<0) or (ID==undefined))  -> 
+					if (NewAckStatus=<0) -> 
 						loggerp!{no_c},
 						cell_monitor!{restart},
-						cell_manager:cast(cell_manager,stop),%terminate cell_manager
+						%cell_manager:cast(cell_manager,stop),%terminate cell_manager
 						general_node:cast(general_node,stop);%terminate general_node
 					true -> %no connetion
 						ID!{keepalive,Host_name,genNode_Mailbox,ets:tab2list(ETS_name)},
