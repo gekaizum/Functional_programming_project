@@ -1,6 +1,6 @@
 erl -setcookie skey -name node1@132.72.80.185
 
-erl -setcookie skey -name node2@127.0.0.1
+erl -setcookie skey -name node2@132.72.81.224
 
 erl -setcookie skey -name node3@132.72.81.167
 
