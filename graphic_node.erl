@@ -82,7 +82,7 @@ handle_info({keepalive,Host,From,ETS_List},{BoardSize,ListOfNodeNames,ListOfServ
 			{noreply,{BoardSize,ListOfNodeNames,ListOfServerNames,TotalProcNum,ETS_name}};
 %%------------------------------------------------------------------------------------------------------------------------------------
 handle_info({send_me},{BoardSize,ListOfNodeNames,ListOfServerNames,TotalProcNum,ETS_name}) ->
-			whereis(sim_gui)!ets:tab2list(ETS_name),
+			whereis(sim_gui)!{ets:tab2list(ETS_name),length(ListOfNodeNames)},
 			{noreply,{BoardSize,ListOfNodeNames,ListOfServerNames,TotalProcNum,ETS_name}}.
 %%/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 %%/////////////////////////////////////////////////////////////termination/////////////////////////////////////////////////////////////
