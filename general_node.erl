@@ -17,25 +17,7 @@ start({Host_name,My_name}) -> gen_server:start({global, My_name},?MODULE,{My_nam
 %%------------------------------------------------------------------------------------------------------------------------------------
 stop(My_name) -> gen_server:stop(My_name).
 %%------------------------------------------------------------------------------------------------------------------------------------
-init({My_name,Host_name}) -> 	%MailboxID=spawn(genNode_Mailbox,genNode_Mailbox,[]),%ETS_name,My_name
-			%global:register(MailboxID,My_name),
-			%register(self(),genNode),
-			%receive %arguments - ({NumberOfCells2Create,RangeOfCoordinates})
-			%	{init,My_name,Cells_Amount,{Xmin,Ymin,Xmax,Ymax},Energy,Organic,EnvEnergy,EnvOrganic} -> %Graphic node must send parameters
-			%			ETS_name=ets:new(local_table,[named_table,read_concurency,set,public]),
-			%			ets_creator(Xmin,Ymin,Xmax,Ymax,ETS_name,EnvEnergy,EnvOrganic,Xmin,Ymin),
-			%			gen_server:start_link({local,cell_manager},cell_manager,[],[]),
-			%			%MailboxID=spawn(genNode_Mailbox,genNode_Mailbox,[ETS_name,My_name]),
-			%			%link(MailboxID),
-			%			%global:register(self(),My_name),
-			%			%register(MailboxID,genNode_Mailbox),
-			%			%global:register(MailboxID,My_name),
-			%			spawn(recovery_system,recovery_mail,[MailboxID,My_name]),
-			%			cell_manager!{init,Cells_Amount,{Xmin,Ymin,Xmax,Ymax},Energy,Organic,ETS_name,My_name},
-			%			{ok,{Xmin,Ymin,Xmax,Ymax,ETS_name,My_name,MailboxID}}
-			%after 10000 -> exit(self()) %something wrong, exit
-			%end.
-			%register(general_node,self()),
+init({My_name,Host_name}) -> 
 			spawn(genNode_Mailbox,logger_process_start,[self()]),
 			{ok,{My_name,Host_name}}.
 %%/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
