@@ -27,7 +27,7 @@ leaf_cell(Energy,Organic,_Cells_created,_Woodded,{X_coordinate,Y_coordinate},ETS
 			[{_,{{EnvEnergy,EnvOrganic},_}}]=ets:lookup(ETS_name,{X_coordinate,Y_coordinate}),%check place in ETS
 			if (EnvEnergy>?MAX_ENERGY) or (EnvOrganic>?MAX_ORGANIC) -> %die condition
 								cell_manager!{die,X_coordinate,Y_coordinate,Organic,Energy}, %inform manager
-						 		exit(self());%die
+						 		exit(self(),"Normal");%die
 			true ->
 					%Ttl=rand:uniform(15),%calc Time to live
 					cell_manager!{new_type,X_coordinate,Y_coordinate,leaf_cell,Ttl},%inform manager to change type in ETS
@@ -36,12 +36,12 @@ leaf_cell(Energy,Organic,_Cells_created,_Woodded,{X_coordinate,Y_coordinate},ETS
 %%------------------------------------------------------------------------------------------------------------------------------------
 leaf_cell_loop(Energy,Organic,{X_coordinate,Y_coordinate},Ttl) -> 
 			receive %wait for timeout
-				{restart} -> exit(self())
+				{restart} -> exit(self(),"Restart")
 			after ?EVENT_TIME -> ok
 			end,
 			New_Ttl=Ttl-1,
 			if (Ttl==0) or (Energy==0) -> cell_manager!{die,X_coordinate,Y_coordinate,Organic,Energy}, %inform manager
-						 			exit(self());%die
+						 			exit(self(),"Normal");%die
 				Energy < ?MAX_ENERGY-1 -> %here might be added condition of sun light on/off	
 										leaf_cell_loop(Energy,Organic,{X_coordinate,Y_coordinate},New_Ttl);%do nothing
 				true -> leaf_cell_loop(Energy-1,Organic,{X_coordinate,Y_coordinate},New_Ttl) %earn energy from sun
@@ -53,21 +53,21 @@ seed_cell(Energy,Organic,_Cells_created,_Woodded,{X_coordinate,Y_coordinate},ETS
 %%------------------------------------------------------------------------------------------------------------------------------------
 seed_cell_loop(Energy,Organic,{X_coordinate,Y_coordinate},ETS_name) -> 
 			receive %wait for timeout
-				{restart} -> exit(self())
+				{restart} -> exit(self(),"Restart")
 			after ?EVENT_TIME -> 
 					if Energy < 3 ->
 								%spawn general cell
 								cell_manager!{new_type,X_coordinate,Y_coordinate,general_cell,-1},%inform manager to change type in ETS
 								CellID=spawn(general_cell_funcs,general_cell,[15,Organic,0,0,{X_coordinate,Y_coordinate},ETS_name,0]),
 								cell_monitor!{add,CellID},%Send ID to cells_monitor
-								exit(self());
+								exit(self(),"NewType");
 						true -> 
 								Random=rand:uniform(10),
 								if Random>5 ->  %spawn general cell
 												cell_manager!{new_type,X_coordinate,Y_coordinate,general_cell,-1},%inform manager to change type in ETS
 												CellID=spawn(general_cell_funcs,general_cell,[15,Organic,0,0,{X_coordinate,Y_coordinate},ETS_name,0]),
 												cell_monitor!{add,CellID},%Send ID to cells_monitor
-												exit(self());
+												exit(self(),"NewType");
 									true -> seed_cell_loop(Energy-1,Organic,{X_coordinate,Y_coordinate},ETS_name)
 								end
 					end
@@ -77,7 +77,7 @@ antena_cell(Energy,Organic,_Cells_created,_Woodded,{X_coordinate,Y_coordinate},E
 			[{_,{{EnvEnergy,EnvOrganic},_}}]=ets:lookup(ETS_name,{X_coordinate,Y_coordinate}),%check place in ETS
 			if EnvOrganic>?MAX_ORGANIC -> %die condition
 						cell_manager!{die,X_coordinate,Y_coordinate,Organic,Energy}, %inform manager
-						exit(self()); %die
+						exit(self(),"Normal"); %die
 			true ->
 					%Ttl=rand:uniform(15),%calc Time to live
 					cell_manager!{new_type,X_coordinate,Y_coordinate,antena_cell,Ttl},%inform manager to change type in ETS
@@ -86,13 +86,13 @@ antena_cell(Energy,Organic,_Cells_created,_Woodded,{X_coordinate,Y_coordinate},E
 %%------------------------------------------------------------------------------------------------------------------------------------
 antena_cell_loop(Energy,Organic,{X_coordinate,Y_coordinate},Ttl) -> 
 			receive %wait for timeout
-				{restart} -> exit(self())
+				{restart} -> exit(self(),"Restart")
 			after ?EVENT_TIME -> ok
 			end,
 			New_Ttl=Ttl-1,
 			if (Ttl==0) or (Energy=<0) -> 
 									cell_manager!{die,X_coordinate,Y_coordinate,Organic,0}, %inform manager
-						 			exit(self());
+						 			exit(self(),"Normal");
 				true -> 
 						antena_cell_loop(Energy-3,Organic,{X_coordinate,Y_coordinate},New_Ttl)
 			end.
@@ -101,7 +101,7 @@ root_cell(Energy,Organic,_Cells_created,_Woodded,{X_coordinate,Y_coordinate},ETS
 			[{_,{{EnvEnergy,EnvOrganic},_}}]=ets:lookup(ETS_name,{X_coordinate,Y_coordinate}),%check place in ETS
 			if EnvEnergy>?MAX_ENERGY -> %die condition
 						cell_manager!{die,X_coordinate,Y_coordinate,Organic,Energy}, %inform manager
-						exit(self()); %die
+						exit(self(),"Normal"); %die
 			true ->
 					%Ttl=rand:uniform(15),%calc Time to live
 					cell_manager!{new_type,X_coordinate,Y_coordinate,root_cell,Ttl},%inform manager to change typy in ETS
@@ -110,13 +110,13 @@ root_cell(Energy,Organic,_Cells_created,_Woodded,{X_coordinate,Y_coordinate},ETS
 %%------------------------------------------------------------------------------------------------------------------------------------
 root_cell_loop(Energy,Organic,{X_coordinate,Y_coordinate},Ttl) -> 
 			receive %wait for timeout
-				{restart} -> exit(self())
+				{restart} -> exit(self(),"Restart")
 			after ?EVENT_TIME -> ok
 			end,
 			New_Ttl=Ttl-1,
 			if (Ttl==0) or (Energy=<0) -> 
 									cell_manager!{die,X_coordinate,Y_coordinate,Organic,Energy}, %inform manager
-						 			exit(self());
+						 			exit(self(),"Normal");
 				Organic>=0 -> 
 						 root_cell_loop(Energy,Organic-5,{X_coordinate,Y_coordinate},New_Ttl);
 				true -> 
