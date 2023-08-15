@@ -1,6 +1,6 @@
 -module(n_gui).
 -export([start/0]).
--export([init_handle_click/2,start_handle_click/2,organic_handle_click/2, energy_handle_click/2, start_sim/8, new_insert/8,cells_malibox/2]).
+-export([init_handle_click/2,start_handle_click/2,organic_handle_click/2, energy_handle_click/2, start_sim/10, new_insert/8,cells_malibox/2]).
 -include_lib("wx/include/wx.hrl").
 -author("Shaked Basa").
 -define(CELL_SIZE,(40)).
@@ -22,7 +22,6 @@ start() ->
 	% Create static labels
 	Label_1 = wxStaticText:new(Init_Frame, ?wxID_ANY, "TotalProcNum"),
 	Label_2 = wxStaticText:new(Init_Frame, ?wxID_ANY, "BoardSize"),
-	Label_3 = wxStaticText:new(Init_Frame, ?wxID_ANY, "Host name 1:"),   		
 	Label_4 = wxStaticText:new(Init_Frame, ?wxID_ANY, "Energy"),
 	Label_5 = wxStaticText:new(Init_Frame, ?wxID_ANY, "Organic"),
 	Label_6 = wxStaticText:new(Init_Frame, ?wxID_ANY, "Environment Energy"),
@@ -31,7 +30,6 @@ start() ->
 	% Create input text fields with initial values and sizes
 	Input_1 = wxTextCtrl:new(Init_Frame, ?wxID_ANY,[{value, "10"}, {size, {300,50}}]),
 	Input_2 = wxTextCtrl:new(Init_Frame, ?wxID_ANY,[{value, "10"}, {size, {300,50}}]),
-	Input_3 = wxTextCtrl:new(Init_Frame, ?wxID_ANY,[{value, "node1@127.0.0.1"}, {size, {300,50}}]),
 	Input_4 = wxTextCtrl:new(Init_Frame, ?wxID_ANY,[{value, "9"}, {size, {300,50}}]),
 	Input_5 = wxTextCtrl:new(Init_Frame, ?wxID_ANY,[{value, "9"}, {size, {300,50}}]),
 	Input_6 = wxTextCtrl:new(Init_Frame, ?wxID_ANY,[{value, "2"}, {size, {300,50}}]),
@@ -41,7 +39,6 @@ start() ->
 	Font = wxFont:new(38,?wxFONTFAMILY_DEFAULT, ?wxFONTSTYLE_NORMAL, ?wxFONTWEIGHT_BOLD),
 	wxTextCtrl:setFont(Input_1, Font),
 	wxTextCtrl:setFont(Input_2, Font),
-	wxTextCtrl:setFont(Input_3, Font),
 	wxTextCtrl:setFont(Input_4, Font),
 	wxTextCtrl:setFont(Input_5, Font),
 	wxTextCtrl:setFont(Input_6, Font),
@@ -61,8 +58,6 @@ start() ->
 	wxSizer:add(MainSizer, Input_1, [{flag, ?wxEXPAND bor ?wxALL}, {border,5}]),
 	wxSizer:add(MainSizer, Label_2, [{flag, ?wxALIGN_CENTRE bor ?wxALL}, {border, 5}]),
 	wxSizer:add(MainSizer, Input_2, [{flag, ?wxEXPAND bor ?wxALL}, {border,5}]),
-	wxSizer:add(MainSizer, Label_3, [{flag, ?wxALIGN_CENTRE bor ?wxALL}, {border, 5}]),
-	wxSizer:add(MainSizer, Input_3, [{flag, ?wxEXPAND bor ?wxALL}, {border,5}]),
 	wxSizer:add(MainSizer, Label_4, [{flag, ?wxALIGN_CENTRE bor ?wxALL}, {border, 5}]),
 	wxSizer:add(MainSizer, Input_4, [{flag, ?wxEXPAND bor ?wxALL}, {border,5}]),
 	wxSizer:add(MainSizer, Label_5, [{flag, ?wxALIGN_CENTRE bor ?wxALL}, {border, 5}]),
@@ -78,38 +73,22 @@ start() ->
 	% Create static labels
 	S_Label_1 = wxStaticText:new(Stats_Frame, ?wxID_ANY, "Number of Cells"),
 	S_Label_2 = wxStaticText:new(Stats_Frame, ?wxID_ANY, "Number of Nodes"),
-	S_Label_3 = wxStaticText:new(Stats_Frame, ?wxID_ANY, "Stat_3"),
-	S_Label_4 = wxStaticText:new(Stats_Frame, ?wxID_ANY, "Stat_4"),
-	S_Label_5 = wxStaticText:new(Stats_Frame, ?wxID_ANY, "Stat_5"),
-	S_Label_6 = wxStaticText:new(Stats_Frame, ?wxID_ANY, "Stat_6"),
 	S_Label_7 = wxStaticText:new(Stats_Frame, ?wxID_ANY, "Sun"),
 
 	% Create Stat text fields with initial values and sizes
 	S_Stat_1 = wxTextCtrl:new(Stats_Frame, ?wxID_ANY,[{value, "0"}, {size, {150,50}}]),
 	S_Stat_2 = wxTextCtrl:new(Stats_Frame, ?wxID_ANY,[{value, "0"}, {size, {150,50}}]),
-	S_Stat_3 = wxTextCtrl:new(Stats_Frame, ?wxID_ANY,[{value, "0"}, {size, {150,50}}]),
-	S_Stat_4 = wxTextCtrl:new(Stats_Frame, ?wxID_ANY,[{value, "0"}, {size, {150,50}}]),
-	S_Stat_5 = wxTextCtrl:new(Stats_Frame, ?wxID_ANY,[{value, "0"}, {size, {150,50}}]),
-	S_Stat_6 = wxTextCtrl:new(Stats_Frame, ?wxID_ANY,[{value, "0"}, {size, {150,50}}]),
 	S_Stat_7 = wxTextCtrl:new(Stats_Frame, ?wxID_ANY,[{value, "UP"}, {size, {150,50}}]),
 	
 	% Disable stats fields to edit
 	wxTextCtrl:setEditable(S_Stat_1, false),
 	wxTextCtrl:setEditable(S_Stat_2, false),
-	wxTextCtrl:setEditable(S_Stat_3, false),
-	wxTextCtrl:setEditable(S_Stat_4, false),
-	wxTextCtrl:setEditable(S_Stat_5, false),
-	wxTextCtrl:setEditable(S_Stat_6, false),
 	wxTextCtrl:setEditable(S_Stat_7, false),
 	
 	% Create a font for the stats text fields
 	S_Font = wxFont:new(38,?wxFONTFAMILY_DEFAULT, ?wxFONTSTYLE_NORMAL, ?wxFONTWEIGHT_BOLD),
 	wxTextCtrl:setFont(S_Stat_1, S_Font),
 	wxTextCtrl:setFont(S_Stat_2, S_Font),
-	wxTextCtrl:setFont(S_Stat_3, S_Font),
-	wxTextCtrl:setFont(S_Stat_4, S_Font),
-	wxTextCtrl:setFont(S_Stat_5, S_Font),
-	wxTextCtrl:setFont(S_Stat_6, S_Font),
 	wxTextCtrl:setFont(S_Stat_7, S_Font),
 
 	% Create a sizer to arrange the elements vertically
@@ -118,14 +97,6 @@ start() ->
 	wxSizer:add(S_Sizer, S_Stat_1, [{flag, ?wxEXPAND bor ?wxALL}, {border,5}]),
 	wxSizer:add(S_Sizer, S_Label_2, [{flag, ?wxALIGN_CENTRE bor ?wxALL}, {border, 5}]),
 	wxSizer:add(S_Sizer, S_Stat_2, [{flag, ?wxEXPAND bor ?wxALL}, {border,5}]),
-	wxSizer:add(S_Sizer, S_Label_3, [{flag, ?wxALIGN_CENTRE bor ?wxALL}, {border, 5}]),
-	wxSizer:add(S_Sizer, S_Stat_3, [{flag, ?wxEXPAND bor ?wxALL}, {border,5}]),
-	wxSizer:add(S_Sizer, S_Label_4, [{flag, ?wxALIGN_CENTRE bor ?wxALL}, {border, 5}]),
-	wxSizer:add(S_Sizer, S_Stat_4, [{flag, ?wxEXPAND bor ?wxALL}, {border,5}]),
-	wxSizer:add(S_Sizer, S_Label_5, [{flag, ?wxALIGN_CENTRE bor ?wxALL}, {border, 5}]),
-	wxSizer:add(S_Sizer, S_Stat_5, [{flag, ?wxEXPAND bor ?wxALL}, {border,5}]),
-	wxSizer:add(S_Sizer, S_Label_6, [{flag, ?wxALIGN_CENTRE bor ?wxALL}, {border, 5}]),
-	wxSizer:add(S_Sizer, S_Stat_6, [{flag, ?wxEXPAND bor ?wxALL}, {border,5}]),
 	wxSizer:add(S_Sizer, S_Label_7, [{flag, ?wxALIGN_CENTRE bor ?wxALL}, {border, 5}]),
 	wxSizer:add(S_Sizer, S_Stat_7, [{flag, ?wxEXPAND bor ?wxALL}, {border,5}]),
 	wxSizer:add(S_Sizer, Start_Button, [{flag, ?wxEXPAND bor ?wxALL}, {border,5}]),	
@@ -135,19 +106,19 @@ start() ->
 	wxSizer:setSizeHints(S_Sizer, Stats_Frame),
 
 	% Connect the button click event to the handle_click function
-	wxButton:connect(Init_Button, command_button_clicked, [{callback, fun init_handle_click/2}, {userData, #{input_1 => Input_1,input_2 => Input_2,input_3 => Input_3,input_4 => Input_4,input_5 => Input_5,input_6 => Input_6,input_7 => Input_7, env => wx:get_env(), init_frame => Init_Frame, stats_frame => Stats_Frame}}]),
+	wxButton:connect(Init_Button, command_button_clicked, [{callback, fun init_handle_click/2}, {userData, #{input_1 => Input_1,input_2 => Input_2,input_4 => Input_4,input_5 => Input_5,input_6 => Input_6,input_7 => Input_7, env => wx:get_env(), init_frame => Init_Frame, stats_frame => Stats_Frame}}]),
 	% Show the main frame
 	wxWindow:show(Init_Frame, [{show, true}]),
-	wxFrame:show(Stats_Frame),
+	%wxFrame:show(Stats_Frame),
 
 	% Connect the button click event to the handle_click function
-	wxButton:connect(Start_Button, command_button_clicked, [{callback, fun start_handle_click/2}, {userData, #{input_2 => Input_2, env => wx:get_env(), stats_frame => Stats_Frame, s_stat_1 =>S_Stat_1 ,organic_button => Organic_Button,energy_button => Energy_Button, init_frame => Init_Frame}}]).
+	wxButton:connect(Start_Button, command_button_clicked, [{callback, fun start_handle_click/2}, {userData, #{input_2 => Input_2, env => wx:get_env(), stats_frame => Stats_Frame, s_stat_1 =>S_Stat_1 ,s_stat_2 =>S_Stat_2 ,organic_button => Organic_Button,energy_button => Energy_Button, init_frame => Init_Frame}}]).
 	
 %-----------------------------------------------------------builds the world and start the simulation------------------------------------------------------------------------------------	
 
 
 %% after click on start button - this func builds the world and start the simulation 
-start_sim(Cell_size,Input_2, Start_Button,Organic_Button,Energy_Button, Env, Stats_Frame, S_Stat_1) ->
+start_sim(Cell_size,Input_2, Start_Button,Organic_Button,Energy_Button, Env, Stats_Frame, Init_Frame, S_Stat_1, S_Stat_2) ->
 	%io:format("~nSimulation started~n",[]),
 	register(sim_gui, self()),
 	(global:whereis_name(main_node)) ! {start},
@@ -161,10 +132,8 @@ start_sim(Cell_size,Input_2, Start_Button,Organic_Button,Energy_Button, Env, Sta
 	% Create a new World_Frame
 	World_Frame = wxFrame:new(wx:null(), 1, "World_Frame",[{size,{Cell_size*Frame_size,Cell_size*Frame_size}}]),
 	% Create a new Organic_Frame
-	%Organic_Frame = wxFrame:new(wx:null(), 2, "Organic_Frame",[{size,{Cell_size*Frame_size + Cell_size*Frame_size div 3,Cell_size*Frame_size}}]),
 	Organic_Frame = 1,
 	% Create a new Energy_Frame
-	%Energy_Frame = wxFrame:new(wx:null(), 3, "Energy_Frame",[{size,{Cell_size*Frame_size + Cell_size*Frame_size div 3,Cell_size*Frame_size}}]),
 	Energy_Frame = 1,	
 			
 	% Load and scale the cells and heatmap images from files
@@ -239,31 +208,27 @@ start_sim(Cell_size,Input_2, Start_Button,Organic_Button,Energy_Button, Env, Sta
     	BmpScale = wxBitmap:new(Scalec),
   	wxImage:destroy(Scale),
   	wxImage:destroy(Scalec),
-  	
-  	%insert the heatmap scale on the organic and energy frames
-  	%wxStaticBitmap:new(Organic_Frame,?wxID_ANY , BmpScale, [{pos,{Cell_size*Frame_size + (Cell_size*Frame_size div 3) div 2, 5}}]),
-  	%wxStaticBitmap:new(Energy_Frame,?wxID_ANY , BmpScale, [{pos,{Cell_size*Frame_size + (Cell_size*Frame_size div 3) div 2, 5}}]),
-  	
+    	
 	% Show the World_Frame to display the canvas
-	display_loop(Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6,Env, 0).
+	display_loop(S_Stat_2, Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, Init_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6,Env, 0).
 
 %------------------------------------------------------------------display_loop ------------------------------------------------------------------------------------	
 		
 		
 %% Function to continuously update and display the Sim World
 
-display_loop(Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6,Env, 0) ->
+display_loop(S_Stat_2, Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, Init_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6,Env, 0) ->
 	wxFrame:show(World_Frame),
 	
 	wxButton:connect(Organic_Button, command_button_clicked, [{callback, fun organic_handle_click/2}, {userData, #{env => wx:get_env(), organic_frame => Organic_Frame}}]),
 	wxButton:connect(Energy_Button, command_button_clicked, [{callback, fun energy_handle_click/2}, {userData, #{env => wx:get_env(), energy_frame => Energy_Frame}}]),
 		
-	display_loop(Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6,Env, 1);
+	display_loop(S_Stat_2, Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, Init_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6,Env, 1);
 	
-display_loop(Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6,Env, 1) ->
+display_loop(S_Stat_2, Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, Init_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6,Env, 1) ->
 			
 			% Print the updated windows
-			Num_of_cells = print_cells(Env, World_Frame, Organic_Frame, Energy_Frame,Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6),
+			Num_of_cells = print_cells(Stats_Frame, Init_Frame, S_Stat_2, Start_Button, Env, World_Frame, Organic_Frame, Energy_Frame,Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6),
 			if Num_of_cells == -1 ->
 				wxFrame:destroy(World_Frame),
 				ok;
@@ -272,44 +237,40 @@ display_loop(Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,Wor
 				wxTextCtrl:setValue(S_Stat_1, integer_to_list(Num_of_cells)),
 				wxWindow:refresh(World_Frame),
 				wxWindow:refresh(Stats_Frame),
-				%wxWindow:refresh(Energy_Frame),
-				%wxWindow:refresh(Organic_Frame),
-				%wxWindow:refresh(Stats_Frame),
 
 				% Recursive call to continue the loop
-				display_loop(Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6,Env, 1)
+				display_loop(S_Stat_2, Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, Init_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6,Env, 1)
 			end.
 			
 %-------------------------------------------------receive block and printing the cells on the frame ---------------------------------------------------------------------
 
 
 %% Function to print cells on the canvas based on received from the graphic node
-print_cells(Env, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6) ->
+print_cells(Stats_Frame, Init_Frame, S_Stat_2, Start_Button, Env, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6) ->
 	receive
 		{kill} -> 
+			
 			wxFrame:destroy(World_Frame),
-			%wx:destroy(),
-			%spawn(?MODULE, start, []),
+			wxFrame:hide(Stats_Frame),
+			wxButton:setLabel(Start_Button, "Start"),
+			timer:sleep(1000),
+			wxFrame:show(Init_Frame),
 			exit(self());
-			%Val = -1,
-			%Val;
 
-		%%ETS line [{{X_coordinate,Y_coordinate},{{EnvOrganic,EnvEnergy},{cell_type,energy,organic,TTL,cells_created,wooded}}},{...},{...}] no cell = none
-		List -> 
+		{List, Nodes} -> 
+			
+			wxTextCtrl:setValue(S_Stat_2, integer_to_list(Nodes)),
 			wxWindow:destroyChildren(World_Frame),
-			Counter = insert_cells(List, Env, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, 0),			%wxWindow:refresh(World_Frame),
+			Counter = insert_cells(List, Env, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, 0),		
 			Counter	
 		after 900 -> 	
-			global:whereis_name(main_node)!{send_me},
-			print_cells(Env, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6)	
+			ID=global:whereis_name(main_node),
+			if ID==undefined -> ok;
+			true -> ID!{send_me}
+			end,
+			print_cells(Stats_Frame, Init_Frame, S_Stat_2, Start_Button, Env, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6)	
 	end.
 	
-
-%%Function to create and print the cell objs on the world frame
-%insert_cells([], _World_Frame,_Organic_Frame, _Energy_Frame, _Cell_size, _BmpGeneral, _BmpSeed, _BmpLeaf , _BmpAntena , _BmpRoot, _BmpH1, _BmpH2, _BmpH3, _BmpH4, _BmpH5, _BmpH6, Counter) ->
-%	Counter;
-
-%insert_cells([{{X_axis,Y_axis},{{EnvOrganic,EnvEnergy},{Cell_type,_Energy,_Organic,_TTL,_Cells_created,_Wooded}}}|T], World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter) ->
 
 insert_cells(List,Env, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter) ->	
 
@@ -319,124 +280,30 @@ insert_cells(List,Env, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpG
 	spawn_monitor(?MODULE, new_insert, [Env,antena_cell,BmpAntena,World_Frame,Cell_size,List,0,1]),
 	spawn_monitor(?MODULE, new_insert, [Env,root_cell,BmpRoot,World_Frame,Cell_size,List,0,1]),
 	cells_malibox(5,0).	
-	%wxWindow:refresh(World_Frame),
-
-	
-%case Cell_type of
-%		none ->
-%			if
-%			EnvOrganic > 0 ->
-%				if 
-%					EnvOrganic > 25 ->
-%						wxStaticBitmap:new(Organic_Frame,?wxID_ANY , BmpH1, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-%						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
-					
-%					EnvOrganic > 20 ->
-%						wxStaticBitmap:new(Organic_Frame,?wxID_ANY , BmpH2, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-%						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
-						
-%					EnvOrganic > 15 ->
-%						wxStaticBitmap:new(Organic_Frame,?wxID_ANY , BmpH3, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-%						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
-						
-%					EnvOrganic > 10 ->
-%						wxStaticBitmap:new(Organic_Frame,?wxID_ANY , BmpH4, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-%						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
-						
-%					EnvOrganic > 5 ->
-%						wxStaticBitmap:new(Organic_Frame,?wxID_ANY , BmpH5, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-%						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
-						
-%					EnvOrganic > 0 ->
-%						wxStaticBitmap:new(Organic_Frame,?wxID_ANY , BmpH6, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-%						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter)
-						
-%				end;
-				
-				
-%			EnvEnergy > 0 ->	
-%				if
-%					EnvEnergy > 25 ->
-%						wxStaticBitmap:new(Energy_Frame,?wxID_ANY , BmpH1, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-%						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
-						
-%					EnvEnergy > 20 ->
-%						wxStaticBitmap:new(Energy_Frame,?wxID_ANY , BmpH2, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-%						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
-						
-%					EnvEnergy > 15 ->
-
-%						wxStaticBitmap:new(Energy_Frame,?wxID_ANY , BmpH3, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-%						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
-						
-%					EnvEnergy > 10 ->
-
-%						wxStaticBitmap:new(Energy_Frame,?wxID_ANY , BmpH4, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-%						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
-						
-%					EnvEnergy > 5 ->
-
-%						wxStaticBitmap:new(Energy_Frame,?wxID_ANY , BmpH5, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-%						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
-%						
-%					EnvEnergy > 0 ->
-%
-%						wxStaticBitmap:new(Energy_Frame,?wxID_ANY , BmpH6, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-%						insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter)
-						
-%				end;
-				
-%			true ->
-					%	insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter);
-		%	end;
-			
-	
-%		general_cell ->
-%			wxStaticBitmap:new(World_Frame,?wxID_ANY , BmpGeneral, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-%			insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter + 1);
-%		seed_cell ->
-%			wxStaticBitmap:new(World_Frame, ?wxID_ANY, BmpSeed, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-%			insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter + 1);
-%		leaf_cell ->
-%			wxStaticBitmap:new(World_Frame, ?wxID_ANY, BmpLeaf, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-%			insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter + 1);
-%		antena_cell ->
-%			wxStaticBitmap:new(World_Frame, ?wxID_ANY, BmpAntena, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-%			insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter + 1);
-%		root_cell ->
-%			wxStaticBitmap:new(World_Frame, ?wxID_ANY, BmpRoot, [{pos,{(X_axis*Cell_size - (Cell_size div 2)), (Y_axis*Cell_size-(Cell_size div 2))}}]),
-%			insert_cells(T, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6, Counter + 1)
-%	end.
-
 
 
 %-----------------------------------------------------click handlers---------------------------------------------------------------------------------
 
 
 %% Function to handle init_button click events
-init_handle_click(#wx{obj = _Init_Button, userData = #{input_1 := Input_1,input_2 := Input_2,input_3 := Input_3,input_4 := Input_4,input_5 := Input_5,input_6 := Input_6,input_7 := Input_7, env := Env, init_frame := Init_Frame, stats_frame := Stats_Frame}},  _Event) ->
+init_handle_click(#wx{obj = _Init_Button, userData = #{input_1 := Input_1,input_2 := Input_2,input_4 := Input_4,input_5 := Input_5,input_6 := Input_6,input_7 := Input_7, env := Env, init_frame := Init_Frame, stats_frame := Stats_Frame}},  _Event) ->
 	% Set the environment
 	wx:set_env(Env),
 	% Get the label of the clicked Init_Button
-	%Label = wxButton:getLabel(Init_Button),
 	% Handle Init_Button label
-	
 	BoardSize = list_to_integer(wxTextCtrl:getValue(Input_2)),
 	TotalProcNum = list_to_integer(wxTextCtrl:getValue(Input_1)),
-	ListOfNodeNames = [list_to_atom(wxTextCtrl:getValue(Input_3))],
 	Energy = list_to_integer(wxTextCtrl:getValue(Input_4)),
 	Organic = list_to_integer(wxTextCtrl:getValue(Input_5)),
 	EnvEnergy = list_to_integer(wxTextCtrl:getValue(Input_6)),
 	EnvOrganic = list_to_integer(wxTextCtrl:getValue(Input_7)),
-	graphic_node:start([BoardSize,TotalProcNum,['node1@132.72.80.185','node2@132.72.81.224'],[node1,node2],Energy,Organic,EnvEnergy,EnvOrganic]). %ListOfNodeNames=[]
-	%wxWindow:show(Init_Frame, [{show, false}]),
-	%wxFrame:show(Stats_Frame).
-	
-
-	
+	wxFrame:hide(Init_Frame),
+	timer:sleep(1000),
+	wxFrame:show(Stats_Frame),
+	graphic_node:start([BoardSize,TotalProcNum,['node1@132.72.80.185','node2@132.72.81.224','node3@132.72.81.167'],[node1,node2,node3],Energy,Organic,EnvEnergy,EnvOrganic]). %ListOfNodeNames=[]
 
 %% Function to handle start_button click events
-start_handle_click(#wx{obj = Start_Button,userData = #{ input_2 := Input_2, env := Env, stats_frame := Stats_Frame, s_stat_1 := S_Stat_1, organic_button := Organic_Button,energy_button := Energy_Button, init_frame := Init_Frame}}, _Event) ->
+start_handle_click(#wx{obj = Start_Button,userData = #{ input_2 := Input_2, env := Env, stats_frame := Stats_Frame, s_stat_1 := S_Stat_1, s_stat_2 := S_Stat_2, organic_button := Organic_Button,energy_button := Energy_Button, init_frame := Init_Frame}}, _Event) ->
 	wx:set_env(Env),
 	Label = wxButton:getLabel(Start_Button),
 	case Label of
@@ -444,54 +311,38 @@ start_handle_click(#wx{obj = Start_Button,userData = #{ input_2 := Input_2, env 
 		"Start" ->	
 			wxButton:setLabel(Start_Button, "Stop"),
 			Val = list_to_integer(wxTextCtrl:getValue(Input_2)),
-			%io:format("~nBoardSize= ~w~n",[Val]),
-			%io:format("~nStart Pressed,Val=~n",[]),
 			if
 				Val > 108 ->
-					%io:format("~n108~n",[]),
 					Cell_size = 10,
 					wxTextCtrl:setValue(Input_2, integer_to_list(108)),
 					UD_Input_2 = 108,
-					%io:format("~nSpawn start sim~n",[]),
-					spawn(?MODULE, start_sim, [Cell_size , UD_Input_2, Start_Button,Organic_Button,Energy_Button, Env,Stats_Frame,S_Stat_1]);
+					spawn(?MODULE, start_sim, [Cell_size , UD_Input_2, Start_Button,Organic_Button,Energy_Button, Env,Stats_Frame, Init_Frame,S_Stat_1,S_Stat_2]);
 				Val > 54 ->
-					%io:format("~n54~n",[]),
 					% Spawn a new process to start the simulation	
 					Cell_size = 10,
 					UD_Input_2 = list_to_integer(wxTextCtrl:getValue(Input_2)),
 					%io:format("~nSpawn start sim~n",[]),
-					spawn(?MODULE, start_sim, [Cell_size ,UD_Input_2, Start_Button,Organic_Button,Energy_Button, Env,Stats_Frame,S_Stat_1]);	
+					spawn(?MODULE, start_sim, [Cell_size ,UD_Input_2, Start_Button,Organic_Button,Energy_Button, Env,Stats_Frame, Init_Frame,S_Stat_1,S_Stat_2]);	
 				Val > 27 ->
-					%io:format("~n27~n",[]),
 					% Spawn a new process to start the simulation	
 					Cell_size = 20,
 					UD_Input_2 = list_to_integer(wxTextCtrl:getValue(Input_2)),
 					%io:format("~nSpawn start sim~n",[]),
-					spawn(?MODULE, start_sim, [Cell_size ,UD_Input_2, Start_Button,Organic_Button,Energy_Button, Env,Stats_Frame,S_Stat_1]);
+					spawn(?MODULE, start_sim, [Cell_size ,UD_Input_2, Start_Button,Organic_Button,Energy_Button, Env,Stats_Frame, Init_Frame,S_Stat_1,S_Stat_2]);
 
 				true ->
 					%io:format("~n < 27~n",[]),
 					Cell_size = ?CELL_SIZE,
 					UD_Input_2 = list_to_integer(wxTextCtrl:getValue(Input_2)),
 					%io:format("~nSpawn start sim~n",[]),
-					spawn(?MODULE, start_sim, [Cell_size ,UD_Input_2, Start_Button,Organic_Button,Energy_Button, Env,Stats_Frame,S_Stat_1])		
+					spawn(?MODULE, start_sim, [Cell_size ,UD_Input_2, Start_Button,Organic_Button,Energy_Button, Env,Stats_Frame, Init_Frame,S_Stat_1,S_Stat_2])		
 			end;
 		"Stop" ->
 			(global:whereis_name(main_node))!{stop},
-			wxButton:setLabel(Start_Button, "Start"),
-			%wxFrame:destroy(Stats_Frame),
-			timer:sleep(200),			
-			%io:format("~nStop sim~n",[]),
+			%wxButton:setLabel(Start_Button, "Start"),
+			timer:sleep(200),		
 			% Enable input fields and change Start_Button label to "Start"
 			whereis(sim_gui) ! {kill}
-			%io:format("~nMessage to stop frame sent~n",[]),
-			%io:format("~nMessage to stop main_node sent~n",[]),
-			%timer:sleep(200),			
-			%wx:destroy(),
-			%spawn(?MODULE, start, [])
-			%wx:destroy()	
-			%wxWindow:show(Init_Frame, [{show, true}]),
-			%timer:sleep(4000)
 	end.
 
 %% Function to handle organic_button click events
@@ -502,7 +353,6 @@ organic_handle_click(#wx{obj = Organic_Button,userData = #{env := Env, organic_f
 
 		"Show organic" ->	
 			wxButton:setLabel(Organic_Button, "Hide organic");
-			%wxFrame:show(Organic_Frame);
 		"Hide organic" ->
 			wxButton:setLabel(Organic_Button, "Show organic"),
 			wxFrame:hide(Organic_Frame)
@@ -551,7 +401,6 @@ cells_malibox(Counter,Cells) ->
 				cells_malibox(Counter - 1,Cells + Num_of_cells)
 			end
 	end.
-
 
 
 
