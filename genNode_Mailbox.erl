@@ -60,6 +60,8 @@ logger_loop(LogFile,Cell_log) ->
 							logger_loop(LogFile,Cell_log);
 				{cellInfo,Msg} -> io:format(Cell_log,"~s~n",[Msg]),
 						logger_loop(LogFile,Cell_log);
+				{Msg1,Msg2} -> io:format(Cell_log,"~s:~s~n",[Msg1,Msg2]),
+						logger_loop(LogFile,Cell_log);
 				Msg ->  io:format(LogFile,"~s~n",[Msg]),
 						logger_loop(LogFile,Cell_log)
 			end.
