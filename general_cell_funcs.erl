@@ -29,11 +29,11 @@ general_cell(Energy,Organic,Cells_created,Woodded,{X_coordinate,Y_coordinate},ET
 general_cell_loop(Energy,Organic,Cells_created,Woodded,{X_coordinate,Y_coordinate},ETS_name,Actions_array,Transform_array) ->
 		[{_,{{EnvEnergy,EnvOrganic},_}}]=ets:lookup(ETS_name,{X_coordinate,Y_coordinate}),%check place in ETS
 		receive %wait for timeout
-			{restart} -> exit(self())
+			{restart} -> exit(self(),"Restart")
 			after ?EVENT_TIME -> if (((EnvEnergy > ?MAX_ENERGY) or (EnvOrganic > ?MAX_ORGANIC)) or (Energy=<0))-> %check if alive
 									cell_manager!{die,X_coordinate,Y_coordinate,Organic,Energy}, %inform manager
-									io:format("~nDie - EnvEnergy=~p,EnvOrganic=~p,Energy=~p,Organic=~p~n~n",[EnvOrganic,EnvEnergy,Energy,Organic]),
-									exit(self()); 
+									%io:format("~nDie - EnvEnergy=~p,EnvOrganic=~p,Energy=~p,Organic=~p~n~n",[EnvOrganic,EnvEnergy,Energy,Organic]),
+									exit(self(),"Normal"); 
 						 true -> ok %keep going
 						 end
 								
@@ -65,7 +65,7 @@ general_cell_loop(Energy,Organic,Cells_created,Woodded,{X_coordinate,Y_coordinat
 										CellID=spawn(cell_funcs,root_cell,[Energy,Organic,0,0,{X_coordinate,Y_coordinate},ETS_name,Ttl])
 						end,
 						cell_monitor!{add,CellID},%Send ID to cells_monitor
-						exit(self());
+						exit(self(),"NewType");
 			Action == "Eat_cell" -> %eat cell in random position around
 						{X_move,Y_move} = random_move(),
 						{New_X_coordinate,New_Y_coordinate,Add_energy}=gen_server:call(cell_manager,{eat,X_coordinate+X_move,Y_coordinate+Y_move,X_coordinate,Y_coordinate}),
