@@ -23,13 +23,12 @@ genNode_Mailbox_loop(ETS_name,Node_name,AckStatus,Host_name) ->
 					NewAckStatus=AckStatus-1,
 					ID=(global:whereis_name(main_node)),
 					if (NewAckStatus=<0) -> 
-						loggerp!{no_c};
-						%cell_monitor!{restart},
-						%cell_manager:cast(cell_manager,stop),%terminate cell_manager
-						%gen_server:cast(general_node,stop);%terminate general_node
+						loggerp!{no_c},
+						gen_server:stop(Node_name),%terminate general_node
+						genNode_Mailbox_loop(ETS_name,Node_name,20,Host_name);
+					(ID==undefined) -> genNode_Mailbox_loop(ETS_name,Node_name,NewAckStatus,Host_name);
 					true -> %no connetion
 						ID!{keepalive,Host_name,genNode_Mailbox,ets:tab2list(ETS_name)},
-						%rpc:call('graphic_node@127.0.0.1', graphic_node, msg_delivery, [main_node,{keepalive,Node_name,self(),ets:tab2list(ETS_name)}]),
 						loggerp!"Keepalive sent",
 						genNode_Mailbox_loop(ETS_name,Node_name,NewAckStatus,Host_name)	
 					end
