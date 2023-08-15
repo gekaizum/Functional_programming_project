@@ -300,7 +300,7 @@ cell_monitor(List,Node_name) -> %monitors cell processes
 			{'DOWN',_Monitor,process,Proc,Info} -> %cell down, delete from list
 						%io:format("~nCell Die: Reason: ~s~n",[Info]),
 						ID=whereis(loggerp),
-						if ID==undefined -> ok,
+						if ID==undefined -> ok;
 						true -> ID!{"Cell Die: Reason",Info}
 						end,
 						NewList=lists:delete(Proc,List),
