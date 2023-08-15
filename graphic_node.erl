@@ -46,9 +46,12 @@ handle_call({restart,NodeNameDown,ServerNameDown},_From,{BoardSize,ListOfNodeNam
 			logger_main!{sMsg,"Node down, Restarting simulation",ServerNameDown},
 			NewListOfNodeNames = lists:delete(NodeNameDown,ListOfNodeNames),
 			NewListOfServerNames = lists:delete(ServerNameDown,ListOfServerNames),
-			restart_function(BoardSize,NewListOfServerNames,[],ETS_name),
-			logger_main!{sMsg,"Simulation restarted"},
-			{reply,{done},{BoardSize,NewListOfNodeNames,NewListOfServerNames,TotalProcNum,ETS_name}}.%all done
+			if (length(NewListOfNodeNames)>0) ->
+				restart_function(BoardSize,NewListOfServerNames,[],ETS_name),
+				logger_main!{sMsg,"Simulation restarted"},
+				{reply,{done},{BoardSize,NewListOfNodeNames,NewListOfServerNames,TotalProcNum,ETS_name}};%all done
+			true -> {stop,normal,ok,{BoardSize,NewListOfNodeNames,NewListOfServerNames,TotalProcNum,ETS_name}}
+			end.
 %%/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 %%/////////////////////////////////////////////////////Handlers of type cast///////////////////////////////////////////////////////////
 %%/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
