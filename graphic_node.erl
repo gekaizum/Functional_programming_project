@@ -119,7 +119,7 @@ field_devider(Start_y,TotalProcNum,ActiveHosts,SizeLeft,BoardSize,List) -> %List
 	if  ActiveHosts==1 -> %we have only one host
 			field_devider(Start_y,TotalProcNum,0,0,BoardSize,List++[{{1,Start_y,BoardSize,Start_y+SizeLeft-1},TotalProcNum}]);
 		((Size>0) and (Amount>0)) -> 
-			field_devider(Start_y+Size,TotalProcNum-Amount,ActiveHosts-1,SizeLeft-Size,BoardSize,List++[{{1,Start_y,BoardSize,Start_y+Size-1},TotalProcNum-Amount}]);
+			field_devider(Start_y+Size,TotalProcNum-Amount,ActiveHosts-1,SizeLeft-Size,BoardSize,List++[{{1,Start_y,BoardSize,Start_y+Size-1},Amount}]);
 		true -> %%no processes for other hosts
 			field_devider(Start_y+Size,0,ActiveHosts-1,SizeLeft-Size,BoardSize,List++[{{1,Start_y,BoardSize,Start_y+Size-1},TotalProcNum}])
 	end.
