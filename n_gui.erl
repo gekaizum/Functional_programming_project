@@ -228,7 +228,7 @@ display_loop(S_Stat_2, Frame_size,Cell_size, Start_Button,Organic_Button,Energy_
 display_loop(S_Stat_2, Frame_size,Cell_size, Start_Button,Organic_Button,Energy_Button,World_Frame, Organic_Frame, Energy_Frame, Stats_Frame, Init_Frame, S_Stat_1, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6,Env, 1) ->
 			
 			% Print the updated windows
-			Num_of_cells = print_cells(Stats_Frame, Init_Frame, S_Stat_2, Start_Button, Env, World_Frame, Organic_Frame, Energy_Frame,Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6),
+			Num_of_cells = print_cells(Stats_Frame, Init_Frame, S_Stat_1, S_Stat_2, Start_Button, Env, World_Frame, Organic_Frame, Energy_Frame,Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6),
 			if Num_of_cells == -1 ->
 				wxFrame:destroy(World_Frame),
 				ok;
@@ -246,11 +246,13 @@ display_loop(S_Stat_2, Frame_size,Cell_size, Start_Button,Organic_Button,Energy_
 
 
 %% Function to print cells on the canvas based on received from the graphic node
-print_cells(Stats_Frame, Init_Frame, S_Stat_2, Start_Button, Env, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6) ->
+print_cells(Stats_Frame, Init_Frame,S_Stat_1, S_Stat_2, Start_Button, Env, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6) ->
 	receive
 		{kill} -> 
 			
 			wxFrame:destroy(World_Frame),
+			wxTextCtrl:setValue(S_Stat_1,"0"),
+			wxTextCtrl:setValue(S_Stat_2,"0"),
 			wxFrame:hide(Stats_Frame),
 			wxButton:setLabel(Start_Button, "Start"),
 			timer:sleep(1000),
@@ -268,7 +270,7 @@ print_cells(Stats_Frame, Init_Frame, S_Stat_2, Start_Button, Env, World_Frame, O
 			if ID==undefined -> ok;
 			true -> ID!{send_me}
 			end,
-			print_cells(Stats_Frame, Init_Frame, S_Stat_2, Start_Button, Env, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6)	
+			print_cells(Stats_Frame, Init_Frame, S_Stat_1, S_Stat_2, Start_Button, Env, World_Frame, Organic_Frame, Energy_Frame, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot, BmpH1, BmpH2, BmpH3, BmpH4, BmpH5, BmpH6)	
 	end.
 	
 
