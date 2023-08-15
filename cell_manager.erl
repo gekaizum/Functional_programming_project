@@ -298,7 +298,11 @@ cell_monitor(List,Node_name) -> %monitors cell processes
 			{termination} -> delete_all_cells(List),%delete all cells, restarting node
 							loggerp!"All cells deleted";
 			{'DOWN',_Monitor,process,Proc,Info} -> %cell down, delete from list
-						io:format("~nCell Die: Reson: ~s~n",[Info]),
+						%io:format("~nCell Die: Reason: ~s~n",[Info]),
+						ID=whereis(loggerp),
+						if ID==undefined -> ok,
+						true -> ID!{"Cell Die: Reason",Info}
+						end,
 						NewList=lists:delete(Proc,List),
 						cell_monitor(NewList,Node_name);
 			_ -> cell_monitor(List,Node_name) %clean mailbox
