@@ -394,6 +394,21 @@ insert_energy(Env, Cell_size, BmpH1,BmpH2,BmpH3,BmpH4, BmpH5, BmpH6,Energy_Frame
 	true ->
 		insert_energy(Env, Cell_size, BmpH1,BmpH2,BmpH3,BmpH4, BmpH5, BmpH6,Energy_Frame,T,0)
 	end.
+%-------------------------------------------------------------------------------cells_malibox ------------------------------------------------------------------------------------		
+		
+		
+%%function that receives from each process at the end of its run the number of cells
+%%and adds them to the total cells
+cells_malibox(Counter,Cells) ->
+	receive
+		{'DOWN',_,process,_,Num_of_cells} ->
+			if 
+			Counter == 1 ->
+				Cells + Num_of_cells;
+			true ->
+				cells_malibox(Counter - 1,Cells + Num_of_cells)
+			end
+	end.
 
 %--------------------------------------------------------------------------------click handlers-------------------------------------------------------------------------------------
 
@@ -481,32 +496,6 @@ energy_handle_click(#wx{obj = Energy_Button,userData = #{env := Env, energy_fram
 		"Hide energy" ->
 			wxButton:setLabel(Energy_Button, "Show energy"),
 			wxFrame:hide(Energy_Frame)
-	end.
-
-
-
-
-
-
-
-
-	
-				
-		
-		
-		
-		
-
-
-cells_malibox(Counter,Cells) ->
-	receive
-		{'DOWN',_,process,_,Num_of_cells} ->
-			if 
-			Counter == 1 ->
-				Cells + Num_of_cells;
-			true ->
-				cells_malibox(Counter - 1,Cells + Num_of_cells)
-			end
 	end.
 
 
