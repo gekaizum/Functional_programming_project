@@ -129,7 +129,7 @@ terminate(_Reason, {_,_,_,_,_,My_name,_,_}) ->
 %%/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 %%//////////////////////////////////////////////////////////internal funcs/////////////////////////////////////////////////////////////
 %%/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ets_creator(_Xmin,_Ymin,Xmax,Ymax,_ETS_name,_EnvEnergy,_EnvOrganic,Pos_X,Pos_Y) when ((Pos_X > Xmax) and (Pos_Y > Ymax)) -> ok;
+ets_creator(_Xmin,_Ymin,Xmax,_Ymax,_ETS_name,_EnvEnergy,_EnvOrganic,Pos_X,_Pos_Y) when (Pos_X > Xmax) -> ok;
 ets_creator(Xmin,Ymin,Xmax,Ymax,ETS_name,EnvEnergy,EnvOrganic,Pos_X,Pos_Y) when (Pos_Y > Ymax) ->
 					ets_creator(Xmin,Ymin,Xmax,Ymax,ETS_name,EnvEnergy,EnvOrganic,Pos_X+1,Ymin);
 ets_creator(Xmin,Ymin,Xmax,Ymax,ETS_name,EnvEnergy,EnvOrganic,Pos_X,Pos_Y) -> 
