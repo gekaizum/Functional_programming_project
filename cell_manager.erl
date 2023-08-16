@@ -297,7 +297,7 @@ cell_monitor(List,Node_name) -> %monitors cell processes
 						ok;
 			{termination} -> delete_all_cells(List),%delete all cells, restarting node
 							loggerp!"All cells deleted";
-			{'DOWN',_Monitor,process,Proc,{timeout} -> io:format("~nCell Die: Reason: ~s~n",[Info]);
+			{'DOWN',_Monitor,process,Proc,{timeout,_}} -> io:format("~nCell Die: Reason: ~s~n",[Info]);
 			{'DOWN',_Monitor,process,Proc,Info} -> %cell down, delete from list
 						%io:format("~nCell Die: Reason: ~s~n",[Info]),
 						ID=whereis(loggerp),
