@@ -306,8 +306,8 @@ init_handle_click(#wx{obj = _Init_Button, userData = #{input_1 := Input_1,input_
 	wxFrame:hide(Init_Frame),
 	timer:sleep(1000),
 	wxFrame:show(Stats_Frame),
-	%graphic_node:start([BoardSize,TotalProcNum,['node1@132.72.80.185','node2@132.72.81.224','node3@132.72.81.167'],[node1,node2,node3],Energy,Organic,EnvEnergy,EnvOrganic]). %ListOfNodeNames=[]
-	graphic_node:start([BoardSize,TotalProcNum,['node1@127.0.0.1'],[node1],Energy,Organic,EnvEnergy,EnvOrganic]). %ListOfNodeNames=[]
+	graphic_node:start([BoardSize,TotalProcNum,['node1@132.72.80.185','node2@132.72.81.224','node3@132.72.81.167','node4@132.72.81.60'],[node1,node2,node3,node4],Energy,Organic,EnvEnergy,EnvOrganic]). %ListOfNodeNames=[]
+	%graphic_node:start([BoardSize,TotalProcNum,['node1@127.0.0.1'],[node1],Energy,Organic,EnvEnergy,EnvOrganic]). %ListOfNodeNames=[]
 %% Function to handle start_button click events
 
 
