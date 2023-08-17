@@ -8,10 +8,10 @@
 -define(REFRESH_TIME,(1000)).
 
 
-%%*********************************************************************************************************************%%
-%% gui version 2 - Includes all the functions of the first version + heat maps of the organics and energy in the field %%
-%% Heavier code than the first version is less suitable for thousands of processes				       %%
-%%*********************************************************************************************************************%%
+%%****************************************************************************************************************************%%
+%% gui_with_heatmaps - Includes all the functions of the standard version + heat maps of the organics and energy in the field %%
+%% Heavier code than the first version is less suitable for thousands of processes				       	      %%
+%%****************************************************************************************************************************%%
 
 %------------------------------------------------------ start -> the gui and open the init screen of the simulation --------------------------------------------------------------------------
 
