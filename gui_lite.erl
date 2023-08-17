@@ -8,10 +8,10 @@
 -define(REFRESH_TIME,(1000)).
 
 
-%%**********************************************************************************************%%
-%% gui version 3 - improved version of version 1 . The most suitable for thousands of processes %%
-%% still no Flicker-Free, but reduced. 
-%%**********************************************************************************************%%
+%%************************************************************************************************%%
+%% Experimental version of the gui - supports hundreds of thousands of processes 		  %%
+%% a dirty code version, it works but with unused  lines from previous version of the application %%
+%%************************************************************************************************%%
 
 %------------------------------------------------------ start -> the gui and open the init screen of the simulation --------------------------------------------------------------------------	
 
