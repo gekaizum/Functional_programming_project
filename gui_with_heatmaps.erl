@@ -1,4 +1,4 @@
--module(gui_v2).
+-module(gui_with_heatmaps).
 -export([start/0]).
 -export([init_handle_click/2,start_handle_click/2,organic_handle_click/2, energy_handle_click/2, start_sim/10, insert_cells/8, insert_organic/11, insert_energy/11, cells_malibox/2]).
 -include_lib("wx/include/wx.hrl").
