@@ -1,4 +1,4 @@
--module(gui_v3).
+-module(gui_standard).
 -export([start/0]).
 -export([init_handle_click/2, start_handle_click/2, start_sim/8, insert_cells/9, handle_refresh/2,handle_wxErase/2, cells_malibox/2]).
 -include_lib("wx/include/wx.hrl").
@@ -7,9 +7,8 @@
 -define(LEAF_SIZE,(20)).
 -define(REFRESH_TIME,(1000)).
 
-
 %%**********************************************************************************************%%
-%% gui version 3 - improved version of version 1 . The most suitable for thousands of processes %%
+%% gui version 3 - The most suitable for thousands of processes %%
 %% still no Flicker-Free, but reduced. 
 %%**********************************************************************************************%%
 
@@ -215,18 +214,6 @@ display_loop(S_Stat_2, Frame_size,Cell_size, Start_Button,World_Frame, Panel, St
 
 main_mail_box(Stats_Frame, Init_Frame, S_Stat_1, S_Stat_2, Start_Button, Env, World_Frame, Panel, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot) ->
 	receive
-		%{kill} -> 
-		%			
-		%	wxFrame:destroy(World_Frame),
-		%	wxTextCtrl:setValue(S_Stat_1,"0"),
-		%	wxTextCtrl:setValue(S_Stat_2,"0"),
-		%	wxFrame:hide(Stats_Frame),
-		%	wxButton:setLabel(Start_Button, "Start"),
-		%	timer:sleep(1000),
-		%	wxFrame:show(Init_Frame),
-		%	(whereis(main_sim_gui)) ! {kill};
-		%	exit(self());
-
 		{List, Nodes} -> 
 			wxTextCtrl:setValue(S_Stat_2, integer_to_list(Nodes)),
 			frame_update(List, Env, Panel, Cell_size, BmpGeneral, BmpSeed, BmpLeaf , BmpAntena , BmpRoot)		
