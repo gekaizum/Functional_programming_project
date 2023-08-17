@@ -9,7 +9,7 @@
 
 
 %%************************************************************************************************%%
-%% Experimental version of the gui - supports hundreds of thousands of processes 		  %%
+%% gui_lite - Experimental version of the gui - supports hundreds of thousands of processes       %%
 %% a dirty code version, it works but with unused  lines from previous version of the application %%
 %%************************************************************************************************%%
 
