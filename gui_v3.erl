@@ -8,6 +8,11 @@
 -define(REFRESH_TIME,(1000)).
 
 
+%%**********************************************************************************************%%
+%% gui version 3 - improved version of version 1 . The most suitable for thousands of processes %%
+%% still no Flicker-Free, but reduced. 
+%%**********************************************************************************************%%
+
 %------------------------------------------------------ start -> the gui and open the init screen of the simulation --------------------------------------------------------------------------	
 
 start() ->
@@ -308,10 +313,10 @@ init_handle_click(#wx{obj = _Init_Button, userData = #{input_1 := Input_1,input_
 	wxFrame:show(Stats_Frame),
 	graphic_node:start([BoardSize,TotalProcNum,['node1@132.72.80.185','node2@132.72.81.224','node3@132.72.81.167','node4@132.72.81.60'],[node1,node2,node3,node4],Energy,Organic,EnvEnergy,EnvOrganic]). %ListOfNodeNames=[]
 	%graphic_node:start([BoardSize,TotalProcNum,['node1@127.0.0.1'],[node1],Energy,Organic,EnvEnergy,EnvOrganic]). %ListOfNodeNames=[]
+
+
+
 %% Function to handle start_button click events
-
-
-
 start_handle_click(#wx{obj = Start_Button,userData = #{ input_2 := Input_2, env := Env, stats_frame := Stats_Frame, s_stat_1 := S_Stat_1, s_stat_2 := S_Stat_2, init_frame := Init_Frame}}, _Event) ->
 	wx:set_env(Env),
 	Label = wxButton:getLabel(Start_Button),
@@ -349,7 +354,7 @@ start_handle_click(#wx{obj = Start_Button,userData = #{ input_2 := Input_2, env 
 	end.
 
 
-
+%% Function to handle wxPaint events (refresh) to reduce flickering 
 handle_refresh(#wx{event=#wxPaint{}, userData = #{ stats_Frame := Stats_Frame, init_Frame := Init_Frame, s_Stat_1 := S_Stat_1, s_Stat_2 := S_Stat_2, start_Button := Start_Button, env := Env,world_Frame := World_Frame, panel := Panel, cell_size := Cell_size, bmpGeneral := BmpGeneral, bmpSeed := BmpSeed, bmpLeaf := BmpLeaf, bmpAntena := BmpAntena, bmpRoot := BmpRoot}}, _Event) ->
  	register(sim_gui, self()),	
 	%io:format("~nRefresh handler~n",[]),
@@ -363,7 +368,7 @@ handle_refresh(#wx{event=#wxPaint{}, userData = #{ stats_Frame := Stats_Frame, i
 
 
 handle_wxErase(#wx{event=#wxErase{}}, _Event) ->
-	io:format("in here~n"),
+	%io:format("in here~n"),
 	ok.
 
 
