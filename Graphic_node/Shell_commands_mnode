@@ -1,0 +1,26 @@
+erl -setcookie skey -name graphic_node@127.0.0.1
+%%-------------------------------------------
+%%choose one of the following options
+%%Option 1:
+
+c(graphic_node).
+c(main_logger).
+c(gui_standart).
+gui_standart:start().
+
+%%-------------------------------------------
+%%Option 2:
+
+c(graphic_node).
+c(main_logger).
+c(gui_lite).
+gui_lite:start().
+
+%%-------------------------------------------
+%%Option 3:
+
+c(graphic_node).
+c(main_logger).
+c(gui_with_heatmaps).
+gui_with_heatmaps:start().
+%%-------------------------------------------
