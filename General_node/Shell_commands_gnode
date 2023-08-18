@@ -1,0 +1,13 @@
+erl -setcookie skey -name node1@132.72.80.185
+
+erl -setcookie skey -name node2@132.72.81.224
+
+erl -setcookie skey -name node3@132.72.81.167
+
+erl -setcookie skey -name node4@132.72.81.60
+
+c(general_node).
+c(genNode_Mailbox).
+c(cell_manager).
+c(cell_funcs).
+c(general_cell_funcs).
