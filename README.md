@@ -5,4 +5,4 @@ Main purpose is to check our abilities to implement program, using received skil
 Each cell is Erlang process which interact with relevant Erlang gen server.
 User interface was done using wxWidgets.
 In Documentation folder you can find full description of project, Final State Machines for each part of app, results of our tests.
-Full installation guid and requirements is in file INSTALL_GUID.txt.
+Full installation guid and requirements is in file INSTALL_GUIDE.txt.
