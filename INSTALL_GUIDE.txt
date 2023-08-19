@@ -5,8 +5,9 @@ Technical Requirements:
 1. Apllication needs minimum 2 Erlang nodes to run simulation. One node called “Main node” and “General nodes”.
 2. Nodes might be distributed - different machines or can run in the same computer. In second case, each general node needs to be launched from different directory to prevent overlapping of log files.
 3. Application developed on Erlang OTP 25, but also tested on Erlang OTP 24.
-4. Application developed for Linux Mint and Ubuntu 20.04 and was tested on these OS.
-5. World size might be always bigger than number of cells at start of simulation. (More detailed explain could be found in “Design” chapter in the Life_andEvolution_of_Cells.docx)
+4. wxWidgets for Erlang required for GUI.
+5. Application developed for Linux Mint and Ubuntu 20.04 and was tested on these OS.
+6. World size might be always bigger than number of cells at start of simulation. (More detailed explain could be found in “Design” chapter in the Life_andEvolution_of_Cells.docx)
 
 The application has 3 GUI versions:
 
