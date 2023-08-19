@@ -5,9 +5,10 @@ Technical Requirements:
 1. Apllication needs minimum 2 Erlang nodes to run simulation. One node called “Main node” and “General nodes”.
 2. Nodes might be distributed - different machines or can run in the same computer. In second case, each general node needs to be launched from different directory to prevent overlapping of log files.
 3. Application developed on Erlang OTP 25, but also tested on Erlang OTP 24.
-4. World size might be always bigger than number of cells at start of simulation. (More detailed explain could be found in “Design” chapter in the Life_andEvolution_of_Cells.docx)
+4. Application developed for Linux Mint and Ubuntu 20.04 and was tested on these OS.
+5. World size might be always bigger than number of cells at start of simulation. (More detailed explain could be found in “Design” chapter in the Life_andEvolution_of_Cells.docx)
 
-The application has 3 versions:
+The application has 3 GUI versions:
 
 1.gui_standard - The most suitable for thousands of processes. 
 (It handles up to 10 000 processes with world size 108x108 (108x108 is biggest resolution available in this version of GUI)).
@@ -15,19 +16,20 @@ The application has 3 versions:
 2. Heatmap version has full functionality of standard version and in addition can show frames of current organic/energy distribution in “world”. 
 Its disadvantage is performance, handles a smaller number of objects at screen. This version was tested with up to 500 processes at start on field 30x30.
 
-3. No GUI version was built for “stress” test of application. This version has no world frame, 
+3. No GUI version was built for “stress” test of application. This version has no "world" frame, 
 only statistic panels with buttons to show current number of processes and available hosts.
 Was tested with 50 000 process and 300x300 world size initially on 4 nodes; 90 000 processes and 350x350 world size initially on 5 nodes.
 
-*On the side of the General nodes, there is no difference in the order of installation between the version
-*First activate GENERAL NODES and then activate the GRAPHIC NODE
+*There is same installation instruction of GENERAL NODES for different GUI versions
+*First open Erlang node and compile files for GENERAL NODES and then activate the GRAPHIC NODE
+*Application uses long node names and were not tested with short names, instraction is below
+*When nodes are on the same machine, IP = 127.0.0.1 can be used
 
-to start a General node:
-   
-    1.Open a terminal in the "General_node" folder.
-   
-    2.For the first node, write the following command: erl -setcookie skey -name node1@xxx.xxx.xxx.xxx (Where xxx.xxx.xxx.xxx is the IP address of the computer).
-      *for the nth node: erl -setcookie skey -name noden@xxx.xxx.xxx.xxx (Where xxx.xxx.xxx.xxx is the IP address of the computer, and "n" is the node number).
+To start a General node:
+    1. Download "General_node" folder from GitHub.
+    2. Open a terminal in the "General_node" folder.
+    3.For the first node, write the following command: erl -setcookie skey -name node1@xxx.xxx.xxx.xxx (Where xxx.xxx.xxx.xxx is the IP address of the computer).
+      *for the node number N: erl -setcookie skey -name nodeN@xxx.xxx.xxx.xxx (Where xxx.xxx.xxx.xxx is the IP address of the computer, and "N" is the node number).
         For example: erl -setcookie skey -name node4@132.72.81.60  (IP address: 132.72.81.60, node number: 4).
     
     3. Compile as follows:
@@ -37,50 +39,50 @@ to start a General node:
         c(cell_funcs).
         c(general_cell_funcs).
    
-    4. now the node is ready to run.
+    4. Node is ready.
 
 
-to start the Graphic_node:
+To start the Graphic_node:
 
     1. After opening the general nodes, you need to update a code line in the gui erl file:
-        a. in gui_standard.erl version go to line 301 and and update the code line according to the general nodes you opened:
-            	graphic_node:start([BoardSize,TotalProcNum,['node1@xxx.xxx.xxx.xxx','node2@xxx.xxx.xxx.xxx',...,'noden@xxx.xxx.xxx.xxx'],[node1,node2,...,noden],Energy,Organic,EnvEnergy,EnvOrganic]). 
-        b. In the gui_with_heatmaps.erl version this line is at 431.
-        c. In the gui_lite.erl version this line is at 314.
+        a. in gui_standard.erl version go to line 301 and update the code line according to the general nodes you opened:
+            	graphic_node:start([BoardSize,TotalProcNum,['node1@xxx.xxx.xxx.xxx','node2@xxx.xxx.xxx.xxx',...,'nodeN@xxx.xxx.xxx.xxx'],[node1,node2,...,nodeN],Energy,Organic,EnvEnergy,EnvOrganic]). 
+        b. In the gui_with_heatmaps.erl version do the same as in previous option at line 431.
+        c. In the gui_lite.erl version do the same as in previous option at line 314.
    
-    2.Open a terminal in the "Graphic_node" folder.
+    2. Open a terminal in the "Graphic_node" folder.
    
-    3.write the following command: erl -setcookie skey -name graphic_node@xxx.xxx.xxx.xxx (Where xxx.xxx.xxx.xxx is the IP address of the computer).
+    3. Write the following command: erl -setcookie skey -name graphic_node@xxx.xxx.xxx.xxx (Where xxx.xxx.xxx.xxx is the IP address of the computer).
         For example: erl -setcookie skey -name graphic_node@132.72.81.60  (IP address: 132.72.81.60).
    
     4. Compile and run as follows:
-        to run the gui_standard:
-        c(graphic_node).
-        c(main_logger).
-        c(gui_standart).
-        gui_standart:start().
+        To run the gui_standard:
+              c(graphic_node).
+              c(main_logger).
+              c(gui_standart).
+              gui_standart:start().
   
-        to run the Heatmap version:
-        c(graphic_node).
-        c(main_logger).
-        c(gui_with_heatmaps).
-        gui_with_heatmaps:start().
+        To run the Heatmap version:
+              c(graphic_node).
+              c(main_logger).
+              c(gui_with_heatmaps).
+              gui_with_heatmaps:start().
   
-        to run the No GUI version(gui_lite):
-        c(graphic_node).
-        c(main_logger).
-        c(gui_lite).
-        gui_lite:start().   
+        To run the No GUI version(gui_lite):
+              c(graphic_node).
+              c(main_logger).
+              c(gui_lite).
+              gui_lite:start().   
  
     5. Now the application is running and the init window has appeared.
         a. User needs to enter starting parameters: 
                TotalProcNum – initial number of cells; 
                BoardSize – “world” size, square with given side size; 
                Energy, Organic – new cells will receive this amount of energy and organic at start; 
-               Environment Energy, Environment Organic – amount energy and organic in each part of the world at the start of simulation.
+               Environment Energy, Environment Organic – amount of energy and organic in each part of the world at the start of simulation.
 
-               ***It is important! The ratio between the amount of TotalProcNum and the BoardSize must be maintained in order for the simulation to run properly. 
-               for example:
+               ***It is important! The ratio between the amount of TotalProcNum and the BoardSize must be maintained in order for the simulation to run properly. In other words "World" size at start might be much                         bigger than number of cells.
+               For example:
                In order to start a simulation with TotalProcNum = 10,000 we will need a BoardSize of at least 108 (108X108) (in the gui_standard).
                In order to start a simulation with TotalProcNum = 500 we will need a BoardSize of at least 30 (30X30). (in the gui_with_heatmaps).
                In order to start a simulation with TotalProcNum = 90,000 we will need a BoardSize of at least 350 (350X350). (in the gui_lite).
@@ -91,3 +93,4 @@ to start the Graphic_node:
            user interface will be changed to the init window and system ready for new simulation.
 
         e. in order to exit the application completely, after pressing stop and returning to the init screen, click on the terminal of the Graphic_node: Ctrl+C
+        f. If using gui_with_heatmaps version, you can press "Show Organic" or "Show Energy", it will open relevant heat map. In order to close the heatmap press "Hide Organic" or "Hide Energy" respectively.
