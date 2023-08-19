@@ -1,4 +1,4 @@
--module(gui_v3).
+-module(gui_lite).
 -export([start/0]).
 -export([init_handle_click/2, start_handle_click/2, start_sim/8, insert_cells/9, handle_refresh/2,handle_wxErase/2, cells_malibox/2]).
 -include_lib("wx/include/wx.hrl").
