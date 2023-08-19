@@ -43,19 +43,19 @@ To start a General node:
 
 
 To start the Graphic_node:
-
-    1. After opening the general nodes, you need to update a code line in the gui erl file:
+    1. Download "Graphic_node" folder from GitHub.
+    2. After opening the general nodes, you need to update a code line in the gui erl file:
         a. in gui_standard.erl version go to line 301 and update the code line according to the general nodes you opened:
             	graphic_node:start([BoardSize,TotalProcNum,['node1@xxx.xxx.xxx.xxx','node2@xxx.xxx.xxx.xxx',...,'nodeN@xxx.xxx.xxx.xxx'],[node1,node2,...,nodeN],Energy,Organic,EnvEnergy,EnvOrganic]). 
         b. In the gui_with_heatmaps.erl version do the same as in previous option at line 431.
         c. In the gui_lite.erl version do the same as in previous option at line 314.
    
-    2. Open a terminal in the "Graphic_node" folder.
+    3. Open a terminal in the "Graphic_node" folder.
    
-    3. Write the following command: erl -setcookie skey -name graphic_node@xxx.xxx.xxx.xxx (Where xxx.xxx.xxx.xxx is the IP address of the computer).
+    4. Write the following command: erl -setcookie skey -name graphic_node@xxx.xxx.xxx.xxx (Where xxx.xxx.xxx.xxx is the IP address of the computer).
         For example: erl -setcookie skey -name graphic_node@132.72.81.60  (IP address: 132.72.81.60).
    
-    4. Compile and run as follows:
+    5. Compile and run as follows:
         To run the gui_standard:
               c(graphic_node).
               c(main_logger).
@@ -74,7 +74,7 @@ To start the Graphic_node:
               c(gui_lite).
               gui_lite:start().   
  
-    5. Now the application is running and the init window has appeared.
+    6. Now the application is running and the init window has appeared.
         a. User needs to enter starting parameters: 
                TotalProcNum – initial number of cells; 
                BoardSize – “world” size, square with given side size; 
